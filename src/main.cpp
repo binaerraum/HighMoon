@@ -689,10 +689,13 @@ private:
 #ifndef __ENVIRONMENT__
 int main( int argc, char *argv[] )
 {
+	language.set( LANG_ENGLISH );
 #else
 int main( int argc, char *argv[], char *envp[] )
 //-----------------------------------------------------------------------------------------
 {
+	language.set( LANG_ENGLISH );
+
 	// Check for Environment-Language
 	int e_len = 0;
 	
@@ -859,6 +862,8 @@ int main( int argc, char *argv[], char *envp[] )
 	delete pf;
 	delete font;
 
+	verbose( "Bye..." );
+	
     	return 0;
 }
 

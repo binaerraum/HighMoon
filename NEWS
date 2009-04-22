@@ -8,6 +8,16 @@
 HighMoon - Duell im All.
 Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
+2005 March 11
+----------------
+HighMoon v1.2.1 - Fixed Bug in Language support, Redeclared 
+Blackholes as Storms. Now they reject Shots. Changed Constants
+for better Gameplay.
+
+HighMoon v1.2.1 - Fehler in der Sprachunterstuetzung behoben.
+Schwarze Loecher sind nun Stuerme; sie stossen Schuesse ab.
+Konstanten fuer runderes Gameplay geandert.
+
 2005 February 19
 ----------------
 HighMoon v1.2 - Added Extras to buy Shield-Power or new Weapons:

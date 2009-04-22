@@ -37,7 +37,7 @@
 //#define __THREADS__		// Tested Threads... didn't work faster =( 
 #define __ENVIRONMENT__		// Has OS Environment?
 
-const std::string VERSION 	= "1.2";
+const std::string VERSION 	= "1.2.1";
 const std::string COPYRIGHT 	= "Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>";
 const std::string WEBSITE 	= "http://highmoon.gerdsmeier.net";
 
@@ -106,7 +106,7 @@ const int WEIGHT_EARTH 		= 300;
 const int WEIGHT_MARS 		= 200;
 const int WEIGHT_VENUS 		= 180;
 const int WEIGHT_SATURN	 	= 250;
-const int WEIGHT_BLACKHOLE 	= 400;
+const int WEIGHT_BLACKHOLE 	= -100;
 const int WEIGHT_WORMHOLE 	= 100;
 const int MAXSTONES 		= 35;
 
@@ -114,7 +114,7 @@ const int MAXSTONES 		= 35;
 const int MAXSHOOTS 		= 1;		// Shoots per Player (Don't change!)
 const int MAXSHOOTPOWER 	= 100;		// 1..100
 const int SHOOTPOWERFACTOR 	= 3;
-const int MAXSHOOTRUN 		= 600;		// max. Frames a Shoot should run
+const int MAXSHOOTRUN 		= 700;		// max. Frames a Shoot should run
 const int SHOOT_INTERVAL 	= 30; 
 
 // COMPUTER

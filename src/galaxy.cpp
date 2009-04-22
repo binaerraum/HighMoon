@@ -364,7 +364,7 @@ Blackhole::Blackhole( double x, double y )
 
 	hole_sprite = new Sprite( "gfx/hole.gif" );
 	width = -1;
-	weight = 350;
+	weight = WEIGHT_BLACKHOLE;
 	spacing = 150;
 	in_background = true;
 
@@ -417,8 +417,8 @@ void Blackhole::draw()
 		if ( ( t_ang -= PI/180*3 ) < 0 ) 
 			t_ang += 2*PI;
 		
-		if ( ( t_len -= t_speed/8+3 ) < 7 ) 
-			t_len += 60+RANDOM(5,-5);
+		if ( ( t_len += t_speed/8+3 ) > 60 ) 
+			t_len -= 60+RANDOM(5,-5);
 
 		delete particles[i];
 		particles[i] = new Vector_2( t_len, t_ang, P );
@@ -477,7 +477,7 @@ Wormhole::Wormhole( double x, double y )
 	if ( (int)RANDOM(2,0) == 1 ) exit_y = -exit_y;
 
 	for ( int i=0; i < MAXWORM; i++ ) 
-		particles[i] = RANDOM(800,-30);
+		particles[i] = (int)( RANDOM(800, 0) ) & 0x0000fff0;
 
 	for ( int i=0; i < MAXWORM/15; i++ ) 
 		start_particles[i] = new Vector_2(
@@ -542,9 +542,10 @@ void Wormhole::draw()
 
 		xx = ( get_X()+pos.getX() ) + Sprite::x_offset;
 		yy = ( get_Y()+pos.getY() ) + Sprite::y_offset;
+		
 		rr = ( 255-( (255*p/path_len)/4 ) )*cf;
 		bb = gg = ( 120+( (255*p/path_len)/4 ) )*cf;
-
+		
 		Sprite::putpixel( (int)xx, (int)yy, SDL_MapRGB( MYSDLSCREEN->format, (int)rr, (int)gg, (int)bb ) );
 	}
 
@@ -564,9 +565,10 @@ void Wormhole::draw()
 		delete start_particles[i];
 		start_particles[i] = new Vector_2( particle.getLength(), particle.getAngle(), P );
 
-		int bb = (int)(50+(particle.getLength()*5));
-		int gg = (int)((particle.getLength()*5));
-		int rr = gg;
+		int rr, gg, bb;
+		bb = (int)(50+(particle.getLength()*5));
+		gg = (int)((particle.getLength()*5));
+		rr = gg;
 
 		int xx = (int)( get_X()+particle.getX() ) + Sprite::x_offset;
 		int yy = (int)( get_Y()+particle.getY() ) + Sprite::y_offset;
