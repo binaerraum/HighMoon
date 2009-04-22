@@ -8,13 +8,27 @@
 HighMoon - Duell im All.
 Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
+2005 February 19
+----------------
+HighMoon v1.2 - Added Extras to buy Shield-Power or new Weapons:
+Added Heavy, Cluster and Exploding Shots. Auto-detecting and 
+setting prefered Language. Window-Icon will be shown again.
+Added Spanish and Russian Language. Disabled Galaxy-Warp 
+while shooting.
+
+HighMoon v1.2 - Extras zum Kaufen von Schildstaerke oder
+neuen Waffen: Schwerer Schuss und Streuschuss. Bevorzugte
+Sprache wird automatisch eingestellt. Fenster-Icon wird
+wieder gezeigt. Spanisch und Russisch hinzugefuegt. Galaxie 
+wird nicht mehr gewarpt, falls ein Schuss aktiv ist.
+
 2005 February 04
 ----------------
 HighMoon v1.1.2 - Some changes in Graphics (Wormholes, Blackholes,
 Planettextures, Background etc.) Adjustment of some Constants.
 Added French, Polish and Portuguese Language.
 
-HighMoon v1.1.2 - Kleinere Aenderungen an der Grafik (Wormloecher,
+HighMoon v1.1.2 - Kleinere Aenderungen an der Grafik (Wurmloecher,
 Schwarze Loecher, Background etc.). Kleine Aenderung an den 
 Konstanten. Franzoesisch, Polnisch und Portugiesisch hinzugefuegt.
 

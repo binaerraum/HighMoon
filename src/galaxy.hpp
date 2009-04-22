@@ -13,11 +13,6 @@
  *
  * Ufo - Flying Saucer. An Ufo-Object contains Shoot-Objects
  *
- * Shoot - A Lasershoot. Contains an Explosion-Object that
- * is drawn when Shoot hits/is been hit.
- *
- * Explosion - Animate an Explosion.
- *
  * Galaxy - This Object contains Planets, Wormholes, Blackholes,
  * Ufos and Shoots.
  *
@@ -42,74 +37,43 @@
 #ifndef __GALAXY_HPP__
 #define __GALAXY_HPP__
 
-#include "constants.hpp"
 #include "vector_2.hpp"
+#include "constants.hpp"
 #include "graphics.hpp"
+#include "object.hpp"
+#include "shoot.hpp"
 
-class Shoot;
 class Galaxy;
+class Shoot;
 
 /************************************************************************
  *									*
- * Spaceobject								*	
+ * Extra								*
  *									*
  ************************************************************************/
-class Spaceobject
+class Extra : public Spaceobject 
 {
 public:
-	Spaceobject( double x=0, double y=0 );
-
-	virtual ~Spaceobject();
+	Extra( double x=0, double y=0 );
 	
-	void set_Pos( double x, double y );
+	~Extra();
 	
-	bool is_in_Background() const;
-
-	double get_X() const;
-
-	double get_Y() const;
-
-	double get_Width() const;
+	void kill();
 	
-	double get_Weight() const;
-	
-	double get_Speed() const;
+	bool check_collision( double x, double y, double width, bool spacing = false );
 
-	double get_Direction() const;
+	void init( Galaxy *galaxy );
 	
-	double get_Spacing() const;
+	void draw();
 	
-	// This is a "real" collision Function. That means
-	// that within this Function the Method hit() is
-	// called.
-	bool has_collision( Spaceobject *object );
+	void hit( Spaceobject *object );
 
-	// This checks if the Object has a collision with an
-	// Area presented by x, y and width values.
-	// Returns TRUE if there was a collision.
-	virtual bool check_collision( double x, double y, double width, bool spacing=false );
-	
-	// Graphical Output on the Screen
-	virtual void draw();
-	
-	// hit() should be implemented from any Spaceobject and should
-	// contain the reaction of the Object if it has a collision
-	// with another Spaceobject.
-	// One can change the Shoot-Status, get the Direction and the
-	// Speed of that Spaceobject etc.
-	virtual void hit( Spaceobject *object );
-
-protected:
-	double x, y;
-	double width, weight;
-	double speed, direction;
-	double spacing;
-	bool in_background;
-
-	bool check_sphere_collision( double x, double y, double width, bool spacing=false );
+private:
+	int wait, waiting;
+	Sprite *extra_sprite;
 };
 
-/************************************************************************
+ /************************************************************************
  *									*
  * Stone ( Moons and Ring-Objects )					*
  *									*
@@ -153,7 +117,7 @@ public:
 
 	~Planet();
 		
-	bool check_collision( double x, double y, double width, bool spacing=false );
+	bool check_collision( double x, double y, double width, bool spacing = false );
 
 	void draw();
 
@@ -211,7 +175,7 @@ public:
 
 	~Wormhole();
 		
-	bool check_collision( double x, double y, double width, bool spacing=false );
+	bool check_collision( double x, double y, double width, bool spacing = false );
 
 	void draw();
 
@@ -221,84 +185,6 @@ private:
 	double exit_x, exit_y;
 	double particles[MAXWORM];
 	Vector_2 *start_particles[MAXWORM/15];
-
-};
-
-/************************************************************************
- *									*
- * Explosion								*	
- *									*
- ************************************************************************/
-class Explosion : public Spaceobject
-{
-public:
-	Explosion( double x=0, double y=0 );
-
-	~Explosion();
-	
-	bool is_active() const;
-
-	void activate( double x, double y );
-	
-	bool check_collision( double x, double y, double width, bool spacing=false );
-
-	void draw();
-
-	void hit( Spaceobject *object );
-
-private:
-	bool exploding;
-	Sprite *explosion_sprite;
-
-};
-
-/************************************************************************
- *									*
- * Shoot								*	
- *									*
- ************************************************************************/
-class Shoot : public Spaceobject
-{
-public:
-	Shoot( double x=0, double y=0 );
-
-	~Shoot();
-	
-	bool is_active();
-
-	bool will_be_a_Hit( int player_id, double factor, Vector_2 start, Vector_2 direction, Galaxy *galaxy );
-
-	void activate( Vector_2 start, Vector_2 vector );
-
-	void destroy();
-
-	bool move( Galaxy *galaxy );
-
-	bool check_collision( double x, double y, double width, bool spacing=false );
-
-	void draw();
-
-	void draw_hint( Vector_2 start, Vector_2 direction, Galaxy *galaxy );
-
-	void hit( Spaceobject *object );
-
-private:
-	bool is_exploding;
-	int moving_time;
-	Vector_2 last_shootPos;
-	int pre_calculated_Steps;
-
-	struct { 
-		int x, y;
-	} pre_calculated_Pos[MAXPRECALC];
-	
-	Sprite *laser_sprite,
-		*laserback_sprite,
-		*laserbackk_sprite;
-
-	Explosion *explosion;
-
-	void calculate_ShootPath( Vector_2 start, Vector_2 direction, Galaxy *galaxy );
 
 };
 
@@ -320,11 +206,21 @@ public:
 
 	int get_Energy() const;
 
+	int get_Bonus() const;
+
+	int get_BoughtWeapon() const;
+
 	void reset();
 
 	void set_Human();
 	
 	void set_Computer();
+	
+	void add_Bonus();
+	
+	void buy_Bonus();
+	
+	void next_Weapon();
 	
 	void activate();
 	
@@ -344,7 +240,7 @@ public:
 	
 	bool calculate_Computer_Move( Galaxy *galaxy, int factor );
 
-	bool check_collision( double x, double y, double width, bool spacing=false );
+	bool check_collision( double x, double y, double width, bool spacing = false );
 
 	void draw();
 	
@@ -358,11 +254,17 @@ private:
 		is_active,
 		is_locked;
 	int shield_strength;
+	int bonus;
+	WeaponId bought_weapon;
 	double shoot_power,
 		shoot_angle;
 	
-	enum { NONE, THINKING, SHOOTING } computer_mode;
-	Shoot *ufo_shoot;
+	enum { 
+		NONE,
+		THINKING,
+		SHOOTING 
+	} computer_mode;
+	
 	Sprite *ufo_sprite, 
 		*circle_sprite, 
 		*thinking_sprite,
@@ -403,9 +305,11 @@ public:
 
 	void kill_all_Shoots();
 	
+	bool has_Extra_collision();
+
 	bool has_collision( Spaceobject *object );
 	
-	bool check_collision( double x, double y, double width, bool spacing=false );
+	bool check_collision( double x, double y, double width, bool spacing = false );
 	
 	bool create( int max, int seed );
 	
@@ -419,9 +323,11 @@ private:
 	bool is_imploding;
 	int objects_in_galaxy;
 	int ufos_in_galaxy;
+	
 	Spaceobject *objects[MAXPLANETS];
 	Ufo **ufos;
 	Shoot *shoot;
+	Extra *extra;
 
 	struct {
 		double x, y;

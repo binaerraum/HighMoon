@@ -3,25 +3,31 @@
 
 # __Something like /usr/local/share/highmoon. All Files (Data and Binary) will be copied there:__ 
 INSTALLPATH=/home/pat/HighMoon
+
 # __Set this to a bin-Path. The Installer will create a small Execution-Script in that Path:__
 INSTALLBIN=/home/pat/prg/bin
 
-CFLAGS = -g -O3 -Wall `sdl-config --cflags`
-CXXFLAGS = $(CFLAGS)
-LIBS = -L. `sdl-config --libs` -lSDL_image
+CACHE	 = #ccache	# use http://ccache.samba.org to speedup compiling
+CXX      = $(CACHE) g++ 
+CXXFLAGS = -g -O3 -Wall `sdl-config --cflags`
+LDFLAGS  =
+LIBS     = -L. `sdl-config --libs` -lSDL_image
+SRCDIR   = src
 MAINNAME = ufo
-CC=g++
 
-OBJS = main.o vector_2.o language.o sound.o graphics.o galaxy.o
+OBJS = 	$(SRCDIR)/main.o $(SRCDIR)/vector_2.o $(SRCDIR)/language.o $(SRCDIR)/sound.o $(SRCDIR)/graphics.o $(SRCDIR)/object.o $(SRCDIR)/galaxy.o $(SRCDIR)/shoot.o
 
-all:	ufo
+all:	$(MAINNAME)
 
 ufo:	$(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(MAINNAME) $(OBJS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(MAINNAME) $(OBJS) $(LIBS)
 
 clean:        
-	rm -f *.o
+	rm -f $(SRCDIR)/*.o
+	rm -f $(SRCDIR)/*~
 	rm -f *~
+
+new: 	clean all
 
 install:
 	mkdir -p $(INSTALLBIN)

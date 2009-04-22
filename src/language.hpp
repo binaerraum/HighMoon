@@ -8,7 +8,9 @@
  * This class contains all Screentexts as methods.
  * Texts depend on their active language. You can 
  * toggle the language via "toogle()".
- * Actually HighMoon has English and German Mode.
+ *
+ * Actually HighMoon has English, German, French, Polish, Portuguese 
+ * and Spanish.
  *
  *
  *
@@ -34,11 +36,13 @@
 #include <iostream>
 
 enum Languagetype {
-	ENGLISH=0,
-	GERMAN=1,
-	FRENCH=2,
-	POLISH=3,
-	PORTUGUESE=4
+	LANG_ENGLISH=0,
+	LANG_GERMAN=1,
+	LANG_FRENCH=2,
+	LANG_POLISH=3,
+	LANG_PORTUGUESE=4,
+	LANG_SPANISH=5,
+	LANG_RUSSIAN=6
 };
 
 class Language
@@ -47,6 +51,10 @@ public:
 	Language();
 	
 	void toggle();
+
+	void set( Languagetype language );
+
+	void set( char *language );
 	
 	char* getWindowtext() const;
 	
@@ -59,7 +67,7 @@ public:
 	std::string getComputertext( int strength ) const;
 	
 	std::string getShieldtext(  int energy ) const;
-	
+
 	std::string getWinnertext( int winner ) const;
 	
 	std::string getWarptext( int seed, int planets ) const;

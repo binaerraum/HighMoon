@@ -7,7 +7,7 @@
  * 
  * Font - use Font to print Text on the Screen
  *
- * Sprite - Sprites are initialized with a Filename of a
+ * Sprite - Sprites are initialised with a Filename of a
  * Picture. Use Sprites to draw Graphics on the Screen.
  * Sprite has a static Function called putpixel().
  *
@@ -39,11 +39,15 @@
 
 #include "constants.hpp"
 
+const double SCREENFACTOR = (double)SCREENWIDTH/1024;
+
+extern SDL_Surface* MYSDLSCREEN;
+
 /******************************************************************************************
  *
  * Font
  *
- * Font is a class that manages a BMP proportional font.
+ * Font is a class that manages a GIF (Background=0xff00ff) proportional Font.
  *
  ******************************************************************************************/
 class Font
@@ -54,6 +58,8 @@ public:
 	~Font();
 	
 	void print( int x, int y, std::string txt, int alpha=255 ); 
+
+	int getLineHeight() const;
 
 	int getWidth( std::string txt );
 	
@@ -69,7 +75,9 @@ private:
  *
  * Sprite
  *
- * Sprite manages a BMP as a screen sprite
+ * Sprite manages a GIF (Background=0xff00ff) as a screen sprite
+ * If Constructed with frames-parameter, Sprite uses serialised
+ * Pictures as Anim with size: Sprite-size / frames;
  *
  ******************************************************************************************/
 class Sprite
@@ -99,7 +107,9 @@ public:
 		
 	void draw();
 	
-	static void putpixel( int x, int y, Uint32 pixel );
+	static void putpixel( int x, int y, Uint32 pixel, SDL_Surface *screen=MYSDLSCREEN );
+
+	static SDL_Surface *zoom( SDL_Surface *surface, double factor = SCREENFACTOR );
 
 private:
 	SDL_Surface *sprite_image;
@@ -117,6 +127,7 @@ private:
  * Star
  *
  * Star contains a Star-Structure (for the background)
+ * Lock Surface before Drawing!
  *
  ******************************************************************************************/
 class Star
@@ -144,6 +155,7 @@ private:
  * Shootingstar
  *
  * A little Backgroud-Effect
+ * Lock Surface before Drawing!
  *
  ******************************************************************************************/
 class Shootingstar
@@ -172,6 +184,7 @@ private:
  * Goldrain
  *
  * Goldrain is a winner goldrain pixel
+ * Lock Surface before Drawing!
  *
  ******************************************************************************************/
 class Goldrain

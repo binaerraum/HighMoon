@@ -28,48 +28,55 @@
 #include "sound.hpp"
 
 Soundset::Sample Soundset::sounds[ NUMBEROFCHANNELS ];
-bool Soundset::soundOn=true;
+bool Soundset::soundOn = true;
 
 Soundset::Soundset()
 {
 	verbose( "Initializing Soundset" );
 
-	char* SOUNDSETNAMES[]={ 
+	char* SOUNDSETNAMES[] = { 
 		"snd/explosion.wav",	// 0
 		"snd/laser.wav",    	// 1
 		"snd/applause.wav",	// 2
-		"snd/beam.wav", 	// 3
+		"snd/curve.wav", 	// 3
 		"snd/kling.wav", 	// 4
-		"snd/pluck.wav" };	// 5
+		"snd/pluck.wav", 	// 5
+		"snd/strom.wav",	// 6
+		"snd/click.wav" };	// 7
 
-	for (int i=0; i<_SOUNDSETNAMES; i++) {
+	for ( int i=0; i < _SOUNDSETNAMES; i++ ) {
 		loadAudio( SOUNDSETNAMES[i], i );
 	}
 
-	soundOn=true;
+	soundOn = true;
 
 	start();
 }
 
 Soundset::~Soundset()
 {
+	verbose( "Deleting Soundset" );
+
 	SDL_CloseAudio();
 	
-	for (int i=0; i<_SOUNDSETNAMES; i++) free( cvt[i].buf ); 
+	for ( int i=0; i < _SOUNDSETNAMES; i++ )
+		free( cvt[i].buf ); 
 }
 
 void Soundset::toggle()
 {
-	soundOn=!soundOn;
+	verbose( "Toggling Sound" );
+
+	soundOn = !soundOn;
 }
 
 void Soundset::play(SoundId id)
 {
-	if (id>=0 && id<=_SOUNDSETNAMES) {
+	if ( id >= 0 && id <= _SOUNDSETNAMES ) {
 		int index;
 
 		// einen leeren Audio-Slot suchen
-		for ( index=0; index<NUMBEROFCHANNELS; ++index )
+		for ( index=0; index < NUMBEROFCHANNELS; ++index )
 			if ( sounds[index].dpos == sounds[index].dlen )
 				break;
 		
@@ -124,7 +131,7 @@ void Soundset::loadAudio( char *filename, int id )
 
 void Soundset::mixAudio( void *, Uint8 *stream, int length )
 {
-	for ( int i=0; i<NUMBEROFCHANNELS; ++i ) {
+	for ( int i=0; i < NUMBEROFCHANNELS; ++i ) {
 		Uint32 size = (sounds[i].dlen-sounds[i].dpos);
 	
 		if ( size > (Uint32)length ) size = length;
