@@ -1,0 +1,17 @@
+##      ##  ##    ######    ##      ##    ####  ####      ######      ######      ######
+##      ##  ##  ##          ##      ##  ##    ##    ##  ##      ##  ##      ##  ##      ##
+##########  ##  ##      ##  ##########  ##    ##    ##  ##      ##  ##      ##  ##      ##
+##      ##  ##  ##      ##  ##      ##  ##    ##    ##  ##      ##  ##      ##  ##      ##
+##      ##  ##    ########  ##      ##  ##    ##    ##    ######      ######    ##      ##
+
+HighMoon - Duell im All.
+Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
+
+Zum Kompilieren unter Linux benoetigt man den GNU g++ und die SDL-Bibliothek:
+make
+
+Das Spiel wird momentan noch nicht installiert, sondern direkt
+aus seinem Verzeichnis gestartet:
+./ufo
+
+Mit make clean werden alle erstellten Dateien geloescht.

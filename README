@@ -1,0 +1,39 @@
+##      ##  ##    ######    ##      ##    ####  ####      ######      ######      ######
+##      ##  ##  ##          ##      ##  ##    ##    ##  ##      ##  ##      ##  ##      ##
+##########  ##  ##      ##  ##########  ##    ##    ##  ##      ##  ##      ##  ##      ##
+##      ##  ##  ##      ##  ##      ##  ##    ##    ##  ##      ##  ##      ##  ##      ##
+##      ##  ##    ########  ##      ##  ##    ##    ##    ######      ######    ##      ##
+
+HighMoon - Duell im All.
+Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
+
+http://highmoon.gerdsmeier.net/
+
+HighMoon ist ein Spiel in der Art von Artillery resp. Worms wobei
+die Aktionsflaeche von HighMoon in verschiedenen Planetensystemen
+spielt.
+
+In dem Spiel muessen sich zwei Ufos beschiessen um sich gegenseitig
+der Schilde zu berauben und letztlich zu vernichten. Zwischen
+den Kontrahenten befindet sich eine Ansammlung von Planeten und
+Monden. Jeder Schuss wird von deren Gravitationsfeldern gnadenlos 
+abgelenkt... dieses erlaubt jedoch auch voellig neue Schusstechniken :)
+
+Spielkommandos sind:
+"1" - Spieler gegen Computer
+"2" - Spieler gegen Spieler
+"3" - Demomodus (Computer gegen Computer)
+
+"TAB"- Wechselt das Planetensystem
+"LEERTASTE" - Schuss aktivieren. je laenger die Leertaste gedrueckt wurde,
+	desto staerker der Schuss.
+
+"F" - Wechselt zwischen Fenster und Fullscreen-Modus 
+"F1" - Schaltet Hilfescroller ein/aus
+
+Das Spiel wird momentan noch nicht installiert. Um es zu starten
+muss man in das Verzeichnis "ufo" wechselt und dort ./ufo aufrufen. 
+Wer moechte kann sich ja ein Alias einrichten oder eine kleine 
+Batchdatei in einen $PATH legen. 
+
+Patrick Gerdsmeier im Januar 2005.
