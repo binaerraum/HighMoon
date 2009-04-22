@@ -1,17 +1,17 @@
 /************************************************************************
  *
- * vector2d
+ * vector_2
  * Patrick Gerdsmeier 2004, <patrick@gerdsmeier.net>
  *
  * Implementiert eine 2D-Vektor Klasse. Vektoren koennen
  * mit ihren karthesisch oder polar initialisiert werden:
  *
- * Vector2d v1=Vector2d( 100, 100, K );
- * Vector2d v2=Vector2d( 100, 100, P );
+ * Vector_2 v1=Vector_2( 100, 100, K );
+ * Vector_2 v2=Vector_2( 100, 100, P );
  * 
  * Vektoren koennen addiert oder subtrahiert werden:
  * 
- * Vector2d v3=v1+v2;
+ * Vector_2 v3=v1+v2;
  * v2-=v1;
  *
  * Vektoren koennen auf Gleichheit ueberprueft werden:
@@ -38,17 +38,17 @@
  *
  ******************************************************************************************/
 
-#ifndef __VECTOR2D_HPP__
-#define __VECTOR2D_HPP__
+#ifndef __VECTOR_2_HPP__
+#define __VECTOR_2_HPP__
 
 #include <iostream>
 
 enum Vectortype { K, P, U };
 
-class Vector2d
+class Vector_2
 {
 public:
-	Vector2d( double, double, Vectortype );
+	Vector_2( double, double, Vectortype );
 
 	bool isInfinite();
 	double getX();
@@ -56,21 +56,21 @@ public:
 	double getLength();
 	double getAngle();
 	
-	bool operator==( Vector2d );
-	bool operator!=( Vector2d );
+	bool operator==( Vector_2 );
+	bool operator!=( Vector_2 );
 	
-	Vector2d& operator+=( Vector2d );
-	Vector2d operator+( Vector2d );
-	Vector2d& operator-=( Vector2d );
-	Vector2d operator-( Vector2d );
+	Vector_2& operator+=( Vector_2 );
+	Vector_2 operator+( Vector_2 );
+	Vector_2& operator-=( Vector_2 );
+	Vector_2 operator-( Vector_2 );
 	
-	double distance( Vector2d );
+	double distance( Vector_2 );
 	double projectOn( double );
-	Vector2d newLength( double );
-	Vector2d newVectorTo( double, double );
+	Vector_2 newLength( double );
+	Vector_2 newVectorTo( double, double );
 
 	static double angleDifference( double, double );
-	static Vector2d rayCrossPoint( Vector2d, double, Vector2d, double );
+	static Vector_2 rayCrossPoint( Vector_2, double, Vector_2, double );
 	
 	void print();
 
@@ -79,7 +79,7 @@ private:
 	bool infinite;
 }; 
 
-	std::ostream& operator<<( std::ostream&, Vector2d );
+	std::ostream& operator<<( std::ostream&, Vector_2 );
 	
 
 #endif

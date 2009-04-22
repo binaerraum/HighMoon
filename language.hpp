@@ -5,9 +5,10 @@
  *
  * "language.hpp"
  * 
- * This class contains all Screentexts as methods. 
- * Texts depend on the active language. You can 
+ * This class contains all Screentexts as methods.
+ * Texts depend on their active language. You can 
  * toggle the language via "toogle()".
+ * Actually HighMoon has English and German Mode.
  *
  *
  *
@@ -49,7 +50,7 @@ public:
 	
 	std::string getPlayertext( int id );
 	
-	std::string getComputertext();
+	std::string getComputertext( int strength );
 	
 	std::string getShieldtext(  int energy );
 	

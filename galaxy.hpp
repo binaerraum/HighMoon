@@ -5,8 +5,21 @@
  *
  * "galaxy.hpp"
  * 
- * This file contains the galaxy and it's objects:
- * Planet, Galaxy, Shoot, Ufo, Explosion
+ * Spaceobject - virtual Object that contains all Information
+ * that is needed for an Object in Galaxy. Extended by all
+ * other Objects.
+ *
+ * Planet, Wormhole, Blackhole - Shown on Screen
+ *
+ * Ufo - Flying Saucer. An Ufo-Object contains Shoot-Objects
+ *
+ * Shoot - A Lasershoot. Contains an Explosion-Object that
+ * is drawn when Shoot hits/is been hit.
+ *
+ * Explosion - Animate an Explosion.
+ *
+ * Galaxy - This Object contains Planets, Wormholes, Blackholes,
+ * Ufos and Shoots.
  *
  *
  *
@@ -30,251 +43,343 @@
 #define __GALAXY_HPP__
 
 #include "constants.hpp"
-#include "vector2d.hpp"
+#include "vector_2.hpp"
 #include "graphics.hpp"
 
+class Shoot;
+class Galaxy;
 
-/******************************************************************************************
- *
- * Planet
- *
- * Contains the data of a planet.
- *
- ******************************************************************************************/
-class Planet
+/************************************************************************
+ *									*
+ * Spaceobject								*	
+ *									*
+ ************************************************************************/
+class Spaceobject
 {
 public:
-	Planet( int x, int y, Planettype type );
+	Spaceobject( double x=0, double y=0 );
+
+	virtual ~Spaceobject();
 	
-	~Planet();
+	void set_Pos( double x, double y );
 	
-	int getX();
+	bool is_in_Background() const;
 
-	int getY();
+	double get_X() const;
+
+	double get_Y() const;
+
+	double get_Width() const;
 	
-	int getWeight();
-
-	int getWidth();
+	double get_Weight() const;
 	
-	bool isWormhole();
+	double get_Speed() const;
+
+	double get_Direction() const;
 	
-	int getWormX();
+	double get_Spacing() const;
 	
-	int getWormY();
+	// This is a "real" collision Function. That means
+	// that within this Function the Method hit() is
+	// called.
+	bool has_collision( Spaceobject *object );
 
-	void setX( int x );
-
-	void setY( int y );
-
-	bool collision( int x, int y, int w, bool active=true, bool init=false );
+	// This checks if the Object has a collision with an
+	// Area presented by x, y and width values.
+	// Returns TRUE if there was a collision.
+	bool check_collision( double x, double y, double width, bool spacing=false );
 	
-	void draw();
-		
-	void drawBlackHole();
+	// Graphical Output on the Screen
+	virtual void draw();
+	
+	// hit() should be implemented from any Spaceobject and should
+	// contain the reaction of the Object if it has a collision
+	// with another Spaceobject.
+	// One can change the Shoot-Status, get the Direction and the
+	// Speed of that Spaceobject etc.
+	virtual void hit( Spaceobject *object );
 
-	static int getWeightByType( Planettype type );
-
-	static Sprite getImageByType( Planettype type );
-
-private:
+protected:
 	double x, y;
-	int weight;
-	int hit;
-	int type;
-	Sprite planet;
-	double holeanim;
-	double hit_x, hit_y;
-	Vector2d *holes[MAXHOLE];
-	double worm_x, worm_y;
+	double width, weight;
+	double speed, direction;
+	double spacing;
+	bool in_background;
 	
-	void animateHit();
+};
+
+/************************************************************************
+ *									*
+ * Planet								*	
+ *									*
+ ************************************************************************/
+class Planet : public Spaceobject
+{
+public:
+	Planet( double x=0, double y=0 );
+
+	~Planet();
+		
+	void draw();
+
+	void hit( Spaceobject *object );
+	
+private:
+	Vector_2 hit_vector;
+
+	enum Planettype { 
+		P_JUPITER=0,
+		P_EARTH=1,
+		P_MARS=2,
+		P_MOON=3 
+	} planet_type;
+
+	Sprite *planet_sprite;
 
 };
 
-/******************************************************************************************
- *
- * Galaxy
- *
- * Contains the information about the galaxy (planets).
- *
- ******************************************************************************************/
-class Galaxy
+/************************************************************************
+ *									*
+ * Blackhole								*	
+ *									*
+ ************************************************************************/
+class Blackhole : public Spaceobject
 {
 public:
-	Galaxy( int planets );
+	Blackhole( double x=0, double y=0 );
+
+	~Blackhole();
+		
+	void draw();
+
+	void hit( Spaceobject *object );
+	
+private:
+	Vector_2 *particles[MAXHOLE];
+	Sprite *hole_sprite;
+	
+};
+
+/************************************************************************
+ *									*
+ * Wormhole								*	
+ *									*
+ ************************************************************************/
+class Wormhole : public Spaceobject
+{
+public:
+	Wormhole( double x=0, double y=0 );
+
+	~Wormhole();
+		
+	void draw();
+
+	void hit( Spaceobject *object );
+	
+private:
+	double exit_x, exit_y;
+	double particles[MAXWORM];
+	Vector_2 *start_particles[MAXWORM/15];
+
+};
+
+/************************************************************************
+ *									*
+ * Explosion								*	
+ *									*
+ ************************************************************************/
+class Explosion : public Spaceobject
+{
+public:
+	Explosion( double x=0, double y=0 );
+
+	~Explosion();
+	
+	bool is_active() const;
+
+	void activate( double x, double y );
+	
+	void draw();
+
+	void hit( Spaceobject *object );
+
+private:
+	bool exploding;
+	Sprite *explosion_sprite;
+
+};
+
+/************************************************************************
+ *									*
+ * Shoot								*	
+ *									*
+ ************************************************************************/
+class Shoot : public Spaceobject
+{
+public:
+	Shoot( double x=0, double y=0 );
+
+	~Shoot();
+	
+	bool is_active();
+
+	bool will_be_a_Hit( int player_id, double factor, Vector_2 start, Vector_2 direction, Galaxy *galaxy );
+
+	void activate( Vector_2 start, Vector_2 vector );
+
+	void destroy();
+
+	bool move( Galaxy *galaxy );
+
+	void draw();
+
+	void draw_hint( Vector_2 start, Vector_2 direction, Galaxy *galaxy );
+
+	void hit( Spaceobject *object );
+
+private:
+	bool is_exploding;
+	int moving_time;
+	Vector_2 last_shootPos;
+	int pre_calculated_Steps;
+
+	struct { 
+		int x, y;
+	} pre_calculated_Pos[MAXPRECALC];
+	
+	Sprite *laser_sprite,
+		*laserback_sprite;
+
+	Explosion *explosion;
+
+	void calculate_ShootPath( Vector_2 start, Vector_2 direction, Galaxy *galaxy );
+
+};
+
+/************************************************************************
+ *									*
+ * Flying Saucer							*	
+ *									*
+ ************************************************************************/
+class Ufo : public Spaceobject
+{
+public:
+	Ufo( double x, double y );
+
+	~Ufo();
+
+	bool is_dead() const;
+	
+	bool is_Computer() const;
+
+	int get_Energy() const;
+
+	void reset();
+
+	void set_Human();
+	
+	void set_Computer();
+	
+	void activate();
+	
+	void deactivate();
+
+	void move_Up();
+
+	void move_Down();
+
+	void inc_ShootAngle();
+
+	void dec_ShootAngle();
+
+	void inc_ShootPower();
+
+	Shoot *shoot();
+	
+	bool calculate_Computer_Move( Galaxy *galaxy, int factor );
+
+	void draw();
+	
+	void draw_hint( Galaxy *galaxy );
+
+	void hit( Spaceobject *object );
+
+private:
+	int player_id;
+	bool is_human,
+		is_active,
+		is_locked;
+	int shield_strength;
+	double shoot_power,
+		shoot_angle;
+	
+	enum { NONE, THINKING, SHOOTING } computer_mode;
+	Shoot *ufo_shoot;
+	Sprite *ufo_sprite, 
+		*circle_sprite, 
+		*thinking_sprite,
+		*shooting_sprite;
+	
+	static int current_playerid;
+
+	void draw_Targetmode();
+
+	void draw_Computermode();
+};
+
+/************************************************************************
+ *									*
+ * Galaxy								*	
+ *									*
+ ************************************************************************/
+class Galaxy 
+{
+public:
+	Galaxy( int max, int seed );
 	
 	~Galaxy();
 
-	Planet** getPlanetList();
+	double get_ShootX() const;
 	
-	int getPlanets();
+	double get_ShootY() const;
 	
-	bool isImploding();
+	bool is_ShootActive() const;
 	
-	void initGalaxy( int planets );
+	bool is_Imploding() const;
 
-	int collision( int x, int y, int w, bool active=true );		
-
-	void draw();
-		
-private:
-	struct { int x, y; } wanted_pos[MAXPLANETS];
-	Planet* galaxy[MAXPLANETS];
-	int planets;
-	bool imploding;	
-
-	bool bigBang();
+	bool is_Ufo_In_Area( int player_id, double x, double y, double factor );
 	
-};
+	void set_Ufos( Ufo **ufos, int max );
 
-/******************************************************************************************
- *
- * Shoot
- *
- * Contains the lasershoot. Functions for the gravity animation and the
- * calculation of a complete path.
- *
- ******************************************************************************************/
-class Shoot
-{
-public:
-	Shoot();
+	void set_Shoot( Shoot *shoot );
+
+	void kill_all_Shoots();
 	
-	int getX();
-
-	int getY();
-
-	int getWidth();
-
-	bool isActive();
-
-	void setPos( double x, double y );
+	bool has_collision( Spaceobject *object );
 	
-	void kill();
+	bool check_collision( double x, double y, double width, bool spacing=false );
 	
-	void activate( Vector2d p, Vector2d v );
+	bool create( int max, int seed );
 	
-	void draw();
-	
-	void drawPrePath( Vector2d vecShootPos, Vector2d vecShoot, Galaxy *galaxy );
-		
-	bool hitEnemy( Vector2d vecShootPos, Vector2d vecShoot, Galaxy *galaxy, int target_x, int target_y, int target_width );
-	
-	bool animate( Planet* galaxy[], int planets );
-	
-private:
-	struct { int x, y; } preCalculatedPos[MAXPRECALC];
-	double x, y, lastx, lasty;
-	bool active;
-	int w;
-	int preCalculated;
-	Sprite shoot, shootback;
-	Vector2d vdir, last_shoot, last_angle;	
-	int shoot_time;
-	
-	void preCalculatePath( Vector2d &vecShootPos, Vector2d &vecShoot, Galaxy *galaxy );
+	void calculate_nextPos( Vector_2 &position, Vector_2 &direction );
 
-	void getNextShootStatus( Vector2d &vecShootPos, Vector2d &vecShoot, Planet *galaxy[], int planets, double timeElapsed );
-};
-
-/******************************************************************************************
- *
- * Ufo
- *
- * Contains the information of the spaceship. Includes the ai-computer move
- *
- ******************************************************************************************/
-class Ufo
-{
-public:
-	Ufo( int x, int y, double sa, bool human );
-	
-	bool isDead();
-
-	bool isActive();
-
-	bool isComputer();
-
-	int getX();
-
-	int getY();
-
-	int getWidth();
-
-	int getEnergy();
-
-	double getShootAngle();
-
-	Vector2d getShootVector();
-
-	Vector2d getShootStart();
-
-	void resetEnergy();
-
-	void subEnergy( int e );
-
-	void incShootAngle();
-
-	void decShootAngle();
-
-	void incShootPower();
-	
-	void activate();
-
-	void inactivate();
-	
-	void moveN();
-
-	void moveS();
-
-	void setComputer( int computer );
-
-	void setPos( int x, int y );
-
-	bool collision( int x, int y, int w );
-	
-	bool calculateComputerMove( Galaxy *galaxy, int target_x, int target_y, int target_width );
+	bool animate();
 	
 	void draw();
 	
 private:
-	int x, y;
-	int energy;
-      	double shoot_angle, shoot_power;
-	bool active, human;
-	enum { NONE, THINKING, SHOOTING } computer_mode;
-	Sprite ufo_sprite, cpkt_sprite, c_think, c_shoot;
-	
-	static Sprite getUfoSprite();
+	bool is_imploding;
+	int objects_in_galaxy;
+	int ufos_in_galaxy;
+	Spaceobject *objects[MAXPLANETS];
+	Ufo **ufos;
+	Shoot *shoot;
 
-	static Sprite getCirclePktSprite();
-	
-	void drawCircle();
-};
+	struct {
+		double x, y;
+	} animate_position[MAXPLANETS];
 
-/******************************************************************************************
- *
- * Explosion
- *
- * Just to show an explosion on the screen.
- *
- ******************************************************************************************/
-class Explosion
-//-----------------------------------------------------------------------------------------
-{
-public:
-	Explosion();
-
-	void activate( int x, int y );
-		
-	void draw();
-	
-private:
-	int x, y;
-	bool active;
-	int counter;
-	Sprite expl_sprite;
+	bool animate_BigBang();
 };
 
 #endif
-

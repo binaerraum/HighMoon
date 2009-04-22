@@ -3,7 +3,7 @@
  * HighNoon - Duell im All Version 1.0
  * Copyright (c) 2005 Patrick Gerdsmeier <patrick@gerdsmeier.net>
  *
- * "language.hpp"
+ * "language.cpp"
  * 
  *
  *
@@ -52,10 +52,11 @@ std::string Language::getTitletext( int id )
 {	
 	const std::string TITLETEXT[]={
 		"HIGHMOON",
-		"",
-		"DUELL IM ALL",
-		"VON PATRICK GERDSMEIER",
+			"",
+		"DUELL IM ALL V1.1",
 		"JANUAR 2005",
+		"VON PATRICK GERDSMEIER,",
+		"PATRICK@GERDSMEIER.NET",
 		"LIZENSIERT UNTER DER GPL",
 		"",
 		"F1 FUER HILFE",
@@ -64,40 +65,45 @@ std::string Language::getTitletext( int id )
 	const std::string TITLETEXT_e[]={
 		"HIGHMOON",
 		"",
-		"DUEL IN SPACE",
-		"BY PATRICK GERDSMEIER",
+		"DUEL IN SPACE V1.1",
 		"JANUARY 2005",
+		"BY PATRICK GERDSMEIER,",
+		"PATRICK@GERDSMEIER.NET",
 		"LICENSED UNDER THE GPL",
 		"",
 		"F1 FOR HELP",
 		"F2 FUER DEUTSCH"
 	};
 
-	if (language==1) return TITLETEXT_e[id];
+	if (language==ENGLISH) return TITLETEXT_e[id];
 	
 	return TITLETEXT[id];
 }
 
 std::string Language::getScrollertext()
 {	
-	const std::string SCROLLERTEXT="DIE TASTEN  1  2  3  FUER SPIELMODUS   "
-		"TAB WECHLSELT DIE GALAXIE   "
-		"CURSOR LINKS UND RECHTS STELLT DEN SCHUSSWINKEL EIN   "
-		"CURSOR OBEN UND UNTEN BEWEGEN DAS UFO   "
-		"LEERTASTE GEDRUECKT LASSEN ZUM ERHOEHEN DER SCHUSSSTAERKE   LEERTASTE LOSLASSEN ZUM FEUERN   "
-		"F WECHSELT ZWISCHEN FENSTER UND FULLSCREEN MODUS   "
-		"HIGHMOON DAS DUELL IM ALL WURDE GESCHRIEBEN IM JANUAR 2005 VON PATRICK GERDSMEIER UND IST LIZENSIERT UNTER DER GPL   VIEL SPASS   "
+	const std::string SCROLLERTEXT=
+		"DIE TASTEN 1, 2 UND 3 FUER SPIELMODUS - "
+		"TAB WECHSELT DIE GALAXIE - "
+		"CURSOR LINKS UND RECHTS STELLT DEN SCHUSSWINKEL EIN - "
+		"CURSOR OBEN UND UNTEN BEWEGEN DAS UFO - "
+		"LEERTASTE GEDRUECKT LASSEN ZUM ERHOEHEN DER SCHUSSSTAERKE - LEERTASTE LOSLASSEN ZUM FEUERN - "
+		"F WECHSELT ZWISCHEN FENSTER UND FULLSCREEN MODUS. "
+		"C WECHSELT DIE COMPUTERSTAERKE I II III IV.   "
+		"HIGHMOON DAS DUELL IM ALL WURDE GESCHRIEBEN IM JANUAR 2005 VON PATRICK GERDSMEIER UND IST LIZENSIERT UNTER DER GPL.   VIEL SPASS!   "
 		"GEWIDMET MEINER ULI     ";
-	const std::string SCROLLERTEXT_e="THE KEYS  1  2  3  FOR GAMEMODE   "
-		"TAB CHANGES THE GALAXY   "
-		"CURSOR LEFT AND RIGHT TO SET THE SHOOTANGLE   "
-		"CURSOR UP AND DOWN TO MOVE THE SPACESHIP   "
-		"KEEP SPACE PRESSED TO INCREASE SHOOTPOWER   RELEASE SPACE TO FIRE   "
-		"F TOGGLES WINDOW AND FULLSCREEN MODE   "
-		"HIGHMOON THE DUEL IN SPACE WAS WRITTEN IN JANUARY 2005 BY PATRICK GERDSMEIER AND IS LICENSED UNDER THE GPL   "
-		"HAVE FUN   DEDICATED TO ULI     ";
+	const std::string SCROLLERTEXT_e=
+		"THE KEYS 1, 2 AND 3 FOR GAMEMODE - "
+		"TAB CHANGES THE GALAXY - "
+		"CURSOR LEFT AND RIGHT TO SET THE SHOOTANGLE - "
+		"CURSOR UP AND DOWN TO MOVE THE SPACESHIP - "
+		"KEEP SPACE PRESSED TO INCREASE SHOOTPOWER - RELEASE SPACE TO FIRE - "
+		"F TOGGLES WINDOW AND FULLSCREEN MODE. "
+		"C TOGGLES COMPUTERSTRENGTH I II III IV.   "
+		"HIGHMOON THE DUEL IN SPACE WAS WRITTEN IN JANUARY 2005 BY PATRICK GERDSMEIER AND IS LICENSED UNDER THE GPL.   "
+		"HAVE FUN!   DEDICATED TO ULI     ";
 
-	if (language==1) return SCROLLERTEXT_e;
+	if (language==ENGLISH) return SCROLLERTEXT_e;
 	
 	return SCROLLERTEXT;
 }
@@ -106,7 +112,7 @@ std::string Language::getPlayertext( int id )
 {
 	std::ostringstream os;
 	
-	if (language==1) {
+	if (language==ENGLISH) {
 		os << "PLAYER " << id;
 
 		return os.str();
@@ -117,16 +123,26 @@ std::string Language::getPlayertext( int id )
 	return os.str();
 }
 
-std::string Language::getComputertext() 
+std::string Language::getComputertext( int strength ) 
 {
-	return "COMPUTER";
+	std::ostringstream os;
+
+	if (language==ENGLISH) {
+		const std::string s[]={ "TRAINEE", "ROOKIE", "HOTSHOT", "ACE", "INSANE" };
+		os << s[strength];
+	} else {
+		const std::string s[]={ "NEULING", "REKRUT", "SOLDAT", "OFFIZIER", "GENERAL" };
+		os << s[strength];
+	}
+	
+	return os.str();
 }
 
 std::string Language::getShieldtext( int energy ) 
 {
 	std::ostringstream os;
 	
-	if (language==1) {
+	if (language==ENGLISH) {
 		os << "SHIELD " << energy;
 
 		return os.str();
@@ -141,15 +157,15 @@ std::string Language::getWinnertext( int winner )
 {
 	std::ostringstream os;
 	
-	if (language==1) {
-		if (winner==-1) return "THE COMPUTER WON";
-		else os << "PLAYER " << winner << " WON";
+	if (language==ENGLISH) {
+		if (winner==-1) return "THE COMPUTER WON!";
+		else os << "PLAYER " << winner << " WON!";
 
 		return os.str();
 	}
 
-	if (winner==-1) return "DER COMPUTER HAT GEWONNEN";
-	else os << "SPIELER " << winner << " HAT GEWONNEN";
+	if (winner==-1) return "DER COMPUTER HAT GEWONNEN!";
+	else os << "SPIELER " << winner << " HAT GEWONNEN!";
 
 	return os.str();
 }
@@ -158,20 +174,20 @@ std::string Language::getWarptext( int seed, int planets )
 {
 	std::ostringstream os;
 
-	if (language==1) {
-		os << "NUMBER " << seed << " " << planets;
+	if (language==ENGLISH) {
+		os << "NUMBER " << seed << "." << planets;
 
 		return os.str();
 	}
 
-	os << "NUMMER " << seed << " " << planets;
+	os << "NUMMER " << seed << "." << planets;
 
 	return os.str();
 }
 
 std::string Language::getWarptext()
 {
-	if (language==1) return "WARPING TO GALAXY";
+	if (language==ENGLISH) return "WARPING TO GALAXY";
 	
 	return "WARPE ZUR GALAXY";
 }

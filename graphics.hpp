@@ -5,8 +5,14 @@
  *
  * "graphics.hpp"
  * 
- * This File contains some graphical classes:
- * Font, Sprite, Star and Goldrain
+ * Font - use Font to print Text on the Screen
+ *
+ * Sprite - Sprites are initialized with a Filename of a
+ * Picture. Use Sprites to draw Graphics on the Screen.
+ * Sprite has a static Function called putpixel().
+ *
+ * Star, Goldrain - Pixel-Classes. Used for Background
+ * and winner Animation
  *
  *
  *
@@ -47,7 +53,7 @@ public:
 	
 	~Font();
 	
-	void print( int x, int y, std::string txt ); 
+	void print( int x, int y, std::string txt, int alpha=255 ); 
 
 	int getWidth( std::string txt );
 	
@@ -55,8 +61,8 @@ private:
 	SDL_Surface *font_image;
 	SDL_Rect src, dst;
 
-	int font_pos[26+10];
-	int font_width[26+10];
+	int font_pos[64];
+	int font_width[64];
 };
 
 /******************************************************************************************
@@ -77,16 +83,18 @@ public:
 
 	static void setOffset( int x, int y );
 
+	bool is_onLastFrame();
+	
 	int getWidth();
 		
-	void setFramerate( int a );
+	void setFramerate( int rate );
 
-	void setRepeatmode( bool r );
+	void setRepeatmode( bool mode );
 
 	void resetFrames();
 	
  	void setPos( int x, int y );
- 	
+
 	void setAlpha( int a );
 		
 	void draw();
@@ -96,10 +104,12 @@ public:
 private:
 	SDL_Surface *sprite_image;
 	SDL_Rect sprite_rect, rect;
-	int x, y, w, h;
-	bool repeat;
-	int frames, act_frame, frame_del, frame_rate;
-	int alpha;
+	int x, y, width, height, alpha;
+	bool repeat_mode;
+	int frames, 
+		actual_frame,
+		frame_delay,
+		frame_rate;
 };
 
 /******************************************************************************************

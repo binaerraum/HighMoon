@@ -1,3 +1,4 @@
+
 ##      ##  ##    ######    ##      ##    ####  ####      ######      ######      ######
 ##      ##  ##  ##          ##      ##  ##    ##    ##  ##      ##  ##      ##  ##      ##
 ##########  ##  ##      ##  ##########  ##    ##    ##  ##      ##  ##      ##  ##      ##
@@ -7,15 +8,38 @@
 HighMoon - Duell im All.
 Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
-19. Januar 2005:
+2005 January 26:
+----------------
+HighMoon v1.1 - Restructured Galaxy-Objects. It is much easier now
+to add new Weapons and Spaceobjects. Changed the look of Wormholes.
+Removed Bug in AI - now Computermoves will be founded much faster.
+Shielddamage now depends on the Shoot. Added commandline Options 
+-h (--help), -v (--version), -f (--fullscreen) and -vi (--videoinfo).
+Score will fade down if the Flying Saucer is behind it. Added some
+letters in Font. You can toggle Computerstrength (TRAINEE, ROOKIE,
+HOTSHOT, ACE, INSANE ) by pressing +. Added Window-Icon. 
+
+HighMoon v1.1 - Galaxy-Objekte umstrukturiert. Es ist jetzt leichter
+neue Objekte zu erstellen. Mal sehen was da kommt - fuer Ideen
+habe ich eimen Blog auf der Homepage eingebaut. Aussehen der 
+Wurmloecher geaendert.  Bug in der AI behoben - der Computer 
+rechnet seinen Zug jetzt viel schneller aus. Die Beschaedigung 
+des Schildes ist nun vom Schuss abhaengig. Command-Line Optionen
+-h (--help), -v (--version), -f (--fullscreen) und -vi (--videoinfo)
+hinzugefuegt. Wenn das Ufo hinter dem Score steht, wird dieser 
+transparent geschaltet. Font um einige Zeichen erweitert. Die 
+Staerke des Computergegners ist mit + einstellbar (TRAINEE, ROOKIE, 
+HOTSHOT,ACE, INSANE ). Window Icon ergaenzt. 
+
+2005 January 19:
 ----------------
 HighMoon v1.0.2 - Fixed some small bugs and graphics.
 Toggle Sound on/off. Code cleanup.
 
 HighMoon v1.0.2 - Kleinere Bugs behoben und Grafiken
-geandert. Sound an/aus. Code aufgeraeumt.
+geandert. Sound an/aus. Quellcodes aufgeraeumt.
 
-18. Januar 2005:
+2005 January 18:
 ----------------
 HighMoon v1.0.1 - New structure for sourcecode, speed-improvements, new
 spaceship-animations, multilinguality (english/german). Translation of the
@@ -28,7 +52,7 @@ der README etc. Einbau von schwarzen Loechern, die ein Gravitationsfeld haben,
 den Schuss aber nicht zerstoeren koennen. Wurmloecher warpen den Schuss an
 eine andere Stelle.
 
-14. Januar 2005:
+2005 January 14:
 ----------------
 HighMoon v1.0 - First Release. With computeropponents and sound.
 

@@ -29,794 +29,1174 @@
 #include "sound.hpp"
 
 extern SDL_Surface* MYSDLSCREEN;
-extern Soundset sound;
+extern Soundset *sound;
 
 #ifdef __DEBUG__
 extern int __SHOOTS;
+extern int __HITS;
 #endif
 
-Planet::Planet( int x, int y, Planettype type ) :
+/************************************************************************
+ *									*
+ * Spaceobject								*	
+ *									*
+ ************************************************************************/
+Spaceobject::Spaceobject( double x, double y )
+:
 	x(x),
 	y(y),
-	weight(getWeightByType(type)),
-	hit(0),
-	type(type),
-	planet(getImageByType(type)),
-	holeanim((int)(360*(rand()/(RAND_MAX+1.0))))
-{ 
-	for (int i=0; i<MAXHOLE; i++) {
-		double l;
-		
-		if (type==BLACKHOLE) l=60*(rand()/(RAND_MAX+1.0))+5;
-		else l=25*(rand()/(RAND_MAX+1.0))+5;
-		
-		double a=2*PI*(rand()/(RAND_MAX+1.0));
-		holes[i]=new Vector2d( l, a, P );
-	}
-	
-	if (type==WORMHOLE) {
-		worm_x=((SCREENWIDTH-350)*(rand()/(RAND_MAX+1.0))+175);
-		worm_y=(SCREENHEIGHT*(rand()/(RAND_MAX+1.0)));
-	}
-}
-	
-Planet::~Planet()
-{
-	for (int i=0; i<MAXHOLE; i++) delete holes[i];
-}
-
-int Planet::getX() { return (int)x; }
-
-int Planet::getY() { return (int)y; }
-
-int Planet::getWeight() { return weight; }
-
-int Planet::getWidth()
-{ 
-	if (type==BLACKHOLE) return -1;
-	if (type==WORMHOLE) return 25;
-
-	return planet.getWidth()-2;
-}
-
-bool Planet::isWormhole() { return (type==WORMHOLE) ? true : false; }
-
-int Planet::getWormX() { return (int)worm_x; }
-
-int Planet::getWormY() { return (int)worm_y; }
-
-void Planet::setX( int x ) { this->x=(double)x; }
-
-void Planet::setY( int y ) { this->y=(double)y; }
-
-bool Planet::collision( int x, int y, int w, bool active, bool init )
-{
-	if (!init && type==BLACKHOLE) return false;
-	
-	bool r=false;	
-	int x2=getX();
-	int y2=getY();
-	int w2=getWidth();
-	int distCenter=(int)(sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2)));
-	int distRadius=(w+w2)/2;
-
-	if (distCenter <= distRadius) {
-		r=true;	
-		
-		if (active) {
-			hit_x=x2-x;
-			hit_y=y2-y;
-			hit=10;
-		}
-	} else hit=0;
-
-	return r;
-}
-
-void Planet::draw() 
-{
-	if (type<BLACKHOLE) {
-		animateHit();
-		planet.setPos((int)x, (int)y);
-		planet.draw();
-	} else {
-		drawBlackHole();
-	}
-	
-}	
-	
-int Planet::getWeightByType( Planettype type )
-{
-	int w;
-
-	switch (type) {
-		case JUPITER:
-			w=WEIGHT_JUPITER;
-			break;
-		case EARTH:
-			w=WEIGHT_EARTH;
-			break;
-		case MARS:
-			w=WEIGHT_MARS;
-			break;
-		case MOON:
-			w=WEIGHT_MOON;
-			break;
-		case BLACKHOLE: w=WEIGHT_BLACKHOLE;
-			break;
-		default:
-			w=WEIGHT_WORMHOLE;
-	}
-
-	return w;
-}
-
-Sprite Planet::getImageByType( Planettype type )
-{
-	char* filename;
-	
-	switch (type) {
-		case JUPITER:
-			filename="gfx/jupiter.bmp";
-			break;
-		case EARTH:
-			filename="gfx/earth.bmp";
-			break;
-		case MARS:
-			filename="gfx/mars.bmp";
-			break;	
-		case MOON:
-			filename="gfx/moon.bmp";
-			break;
-		default:
-			filename="gfx/hole.bmp";
-	}
-	
-	return Sprite(filename);
-}
-
-void Planet::drawBlackHole()
-{
-	int xp=(int)(2*(rand()/(RAND_MAX+1.0))-1);
-	int yp=(int)(2*(rand()/(RAND_MAX+1.0))-1);
-	planet.setAlpha(20);
-	planet.setPos((int)x+xp, (int)y+yp);
-	planet.draw();
-
-	holeanim+=2; if (holeanim>360) holeanim-=360;
-	double m=1;
-	SDL_LockSurface(MYSDLSCREEN);
-	
-	for (int i=0; i<( (type==WORMHOLE)?MAXWORM:MAXHOLE ); i++) {
-		double l=holes[i]->getLength();
-		double a=holes[i]->getAngle();
-		l-=m/5*3; 
-		
-		if (type==BLACKHOLE) { 
-			a-=PI/180*4; 
-			if (a<0) a+=2*PI;
-			if (l<5) l+=65;
-		} else {
-			a+=PI/180*4; 
-			if (a>2*PI) a-=2*PI;		
-			if (l<5) l+=35;
-		}
-
-		delete holes[i];
-		holes[i]=new Vector2d( l, a, P );
-
-		double f=cos(holeanim*PI/180)/6+.75;
-		int xx=(int)( x+(holes[i]->getX())*f)+Sprite::x_offset;
-		int yy=(int)( y+(holes[i]->getY())*f)+Sprite::y_offset;
-
-		if (m++>3) m-=3;
-
-		int r=(type==WORMHOLE) ? (int)(l*3+30) : (int)(l*2+50);
-		int g=(type==WORMHOLE) ? (int)(l*2+50) : (int)(m*l/2+30);
-		int b=(type==WORMHOLE) ? (int)(m*l/2) : (int)(l*2+50);
-		Sprite::putpixel( xx, yy, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
-	}
-	
-	SDL_UnlockSurface(MYSDLSCREEN);
-}
-
-void Planet::animateHit()
-{
-	if (hit>0) {
-		double hh=(cos(45+(90-(double)hit*9)/180*PI)+1)*100/(double)weight;
-		Vector2d v=Vector2d(hit_x, hit_y, K).newLength(hh);
-		x+=v.getX();
-		y+=v.getY();
-		--hit;
-	}
-}
-
-Galaxy::Galaxy( int planets ) : imploding(false)
-{
-	initGalaxy( planets );
-}	
-
-Galaxy::~Galaxy() 
-{
-	for (int i=0; i<planets; i++) delete galaxy[i];
-}
-
-Planet** Galaxy::getPlanetList() { return galaxy; }
-
-int Galaxy::getPlanets() { return planets; }
-
-bool Galaxy::isImploding() { return imploding; }
-
-void Galaxy::initGalaxy( int planets )
-{
-	if (!imploding) {
-		
-		srand(time(NULL));
-
-		// Clear current planets:
-		for (int i=0; i<this->planets; i++) delete galaxy[i];
-
-		if (planets>MAXPLANETS) planets=MAXPLANETS;
-		
-		int myholes=0;
-		this->planets=planets;
-
-		for (int i=0; i<planets; i++) {
-			bool pos_notfound;
-			int x, y, p, w;
-
-			do {
-				x=(int)((SCREENWIDTH-350)*(rand()/(RAND_MAX+1.0))+175);
-				y=(int)(SCREENHEIGHT*(rand()/(RAND_MAX+1.0)));
-				p=(int)((PLANETTYPES)*(rand()/(RAND_MAX+1.0)));
-				w=Planet::getWeightByType((Planettype)p);
-									
-				if (p>=4) myholes++;
-				pos_notfound=false;
-				
-				if (myholes<=MAXHOLES || p<4) {
-					for (int j=0; j<i; j++) {
-						if (galaxy[j]->collision(x, y, 250, false, true)) {
-							pos_notfound=true;
-							break;
-						}	
-					}
-				} else pos_notfound=true;
-				
-			} while (pos_notfound);
-			
-			galaxy[i]=new Planet(x, y, (Planettype)p);
-			wanted_pos[i].y=y;
-		}
-		
-		for (int i=0; i<planets; i++) galaxy[i]->setY(-600);
-
-		sound.play(WARPGALAXY);
-		imploding=true;
-	}
-}
-
-int Galaxy::collision( int x, int y, int w, bool active )
-{
-	for (int i=0; i<planets; i++) {
-		if (galaxy[i]->collision( x, y, w, active )) {
-			return i;
-		}	
-	}
-
-	return -1;
-}
-	
-void Galaxy::draw() 
-{
-	if (imploding) imploding=bigBang();
-		
-	for (int i=0; i<planets; i++) {
-		galaxy[i]->draw();
-	}
-}
-	
-bool Galaxy::bigBang() 
-{
-	bool moving=false;
-	
-	if (imploding) {
-		
-		for (int i=0; i<planets; i++) {
-			int wp=wanted_pos[i].y;
-			int pp=galaxy[i]->getY();
-			int s;
-			
-			if (wp>pp) {
-				moving=true;
-				s=(wp-pp)/10+1;
-				pp=pp+s;
-				if (wp<pp) {
-					pp=wp;
-				}
-			}
-
-			galaxy[i]->setY(pp);
-		}
-	}
-	
-	return moving;
-}
-
-Shoot::Shoot() :
-	x(200), 
-	y(200),
-	active(false),
-	w(8),
-	preCalculated(0),
-	shoot(Sprite("gfx/shoot.bmp")), 
-	shootback(Sprite("gfx/shootback.bmp")),
-	vdir(Vector2d(0,0,K)), 
-	last_shoot(Vector2d(0,0,K)), 
-	last_angle(Vector2d(0,0,K)) 
+	width(0),
+	weight(0),
+	speed(0),
+	direction(0),
+	spacing(0),
+	in_background(false)
 {}
 
-int Shoot::getX() { return (int)x; }
+Spaceobject::~Spaceobject() {};
 
-int Shoot::getY() { return (int)y; }
-
-int Shoot::getWidth() { return w; }
-
-bool Shoot::isActive() { return active; }
-
-void Shoot::setPos( double x, double y )
+void Spaceobject::set_Pos( double x, double y ) 
 {
 	this->x=x;
 	this->y=y;
 }
 
-void Shoot::kill() { active=false; }
-
-void Shoot::activate( Vector2d p, Vector2d v )
+bool Spaceobject::is_in_Background() const
 {
-	vdir=v;
-	this->x=p.getX();
-	this->y=p.getY();
-	lastx=x;
-	lasty=y;
-	active=true;
-	shoot_time=MAXSHOOTRUN;
-	sound.play(SHOOT);
-	
-	#ifdef __DEBUG__
-	__SHOOTS++;
-	#endif
+	return in_background;
 }
 
-void Shoot::draw()
-{
-	if (isActive()) {
-		int blink=(int)(100*(rand()/(RAND_MAX+1.0)));
-
-		if (shoot_time>100 || blink<(shoot_time/2)+25) {
-			
-			int xp=(int)(3*(rand()/(RAND_MAX+1.0))-2);
-			int yp=(int)(3*(rand()/(RAND_MAX+1.0))-2);
-			int ap=(int)(20*(rand()/(RAND_MAX+1.0))-15);
-			
-			shootback.setAlpha(120+ap);
-			shootback.setPos((int)(x+lastx)/2-xp, (int)(y+lasty)/2-yp);
-			shootback.draw();
-			shootback.setAlpha(160+ap);
-			shootback.setPos((int)x+xp, (int)y+yp);
-			shootback.draw();
-			shoot.setPos((int)x, (int)y);
-			shoot.draw();
-		}
-	}
-}
-
-void Shoot::drawPrePath( Vector2d vecShootPos, Vector2d vecShoot, Galaxy *galaxy )
-{
-	static int colorpos=50;
-	if ((colorpos-=20)<50) colorpos=255;
-	
-	preCalculatePath(vecShootPos, vecShoot, galaxy );
-	
-	int c=colorpos;
-	
-	SDL_LockSurface( MYSDLSCREEN );
-	for (int i=0; i<preCalculated; i++) {
-		Sprite::putpixel( preCalculatedPos[i].x+Sprite::x_offset, preCalculatedPos[i].y+Sprite::x_offset, SDL_MapRGB( MYSDLSCREEN->format, c, c, c ) );
-		if ((c+=30)>255) c=50;
-	}
-	SDL_UnlockSurface( MYSDLSCREEN );
-}
-
-bool Shoot::hitEnemy( Vector2d vecShootPos, Vector2d vecShoot, Galaxy *galaxy, int target_x, int target_y, int target_width )
-{
-	preCalculatePath( vecShootPos, vecShoot, galaxy );
-
-	int w2=getWidth();
-
-	for (int i=0; i<preCalculated; i++) {
-		int x2=preCalculatedPos[i].x;
-		int y2=preCalculatedPos[i].y;		
-		int distCenter=(int)(sqrt((target_x-x2)*(target_x-x2)+(target_y-y2)*(target_y-y2)));
-		int distRadius=(w2+target_width)/2;
-
-		if (distCenter <= distRadius) {
-			return true;
-		}
-	}
-	
-	return false;		
-}
-
-bool Shoot::animate( Planet* galaxy[], int planets ) 
-{
-	if ( isActive() ) {
-	
-		static double last_time;
-		
-		if (shoot_time==MAXSHOOTRUN) last_time=SDL_GetTicks();
-		
-		if (shoot_time--<0) {
-			kill();
-			return false;
-		} else {		
-		
-			Vector2d vecShootPos=Vector2d(x, y, K);
-			Vector2d vecShoot=vdir;
-			
-			lastx=x;
-			lasty=y;
-
-			double now_time=SDL_GetTicks();
-			double elapsed_time=now_time-last_time;
-			last_time=now_time;
-			elapsed_time=SHOOT_INTERVAL;
-			
-			getNextShootStatus(vecShootPos, vdir, galaxy, planets, elapsed_time);
-
-			x=vecShootPos.getX();
-			y=vecShootPos.getY();
-		}
-		
-	}
-
-	return true;
-}	
-
-void Shoot::preCalculatePath( Vector2d &vecShootPos, Vector2d &vecShoot, Galaxy *galaxy ) 
-{
-	//if ((preCalculated+=MAXPRECALCPERFRAME)>MAXPRECALC)
-	preCalculated=0;		
-
-	if (last_angle!=vecShoot || last_shoot!=vecShootPos ) {
-		for (int i=0; i<MAXPRECALC; i++) {
-			getNextShootStatus(vecShootPos, vecShoot, galaxy->getPlanetList(), galaxy->getPlanets(), SHOOT_INTERVAL);
-			int x=(int)vecShootPos.getX();
-			int y=(int)vecShootPos.getY();
-			int p=galaxy->collision( x, y, w, false );
-			
-			if ( p!=-1) {
-				if ( galaxy->getPlanetList()[p]->isWormhole() ) {
-					double nx=galaxy->getPlanetList()[p]->getWormX();
-					double ny=galaxy->getPlanetList()[p]->getWormY();
-				
-					vecShootPos=Vector2d( nx, ny, K );
-					x=(int)nx;
-					y=(int)ny;
-				} else break;
-			}
-			preCalculatedPos[i].x=x;
-			preCalculatedPos[i].y=y;
-			preCalculated++;
-		}
-	}
-}
-
-void Shoot::getNextShootStatus( Vector2d &vecShootPos, Vector2d &vecShoot, Planet *galaxy[], int planets, double timeElapsed )
-{
-	Vector2d vecToPlanets=Vector2d(0, 0, K);
-
-	for (int i=0; i<planets; i++) {
-		double posx=galaxy[i]->getX();
-		double posy=galaxy[i]->getY();
-		double weight=galaxy[i]->getWeight();
-
-		// Vektor zum aktuellen Planeten
-		Vector2d vecPlanetPos=Vector2d(posx, posy, K);
-		// Abstand zu unserem Schuss
-		double distance=vecPlanetPos.distance(vecShootPos);
-		// Vektor vom Schuss zum Planeten:
-		Vector2d vecToPlanet=vecPlanetPos-vecShootPos;
-		// Neue Laenge fuer den Vector
-		// (Anziehungskraft ergibt sich physikalisch ;)
-		vecToPlanet=vecToPlanet.newLength(weight/distance);
-		// gemeinsamen Anziehungsvektor aller Planeten erstellen:
-		vecToPlanets=vecToPlanets+vecToPlanet;
-	}
-	// Alle Anziehungsvektoren werden zum Schussvektor addiert
-	vecShoot=vecShoot+vecToPlanets;
-
-	// Neuen Schussvektor zur Schussposition addieren:
-	vecShootPos+=vecShoot.newLength( vecShoot.getLength()*timeElapsed/1000);
-}
-
-Ufo::Ufo( int x, int y, double sa, bool human ) :
-	x(x),
-	y(y),
-	energy(MAXENERGY), 
-	shoot_angle(sa),
-	shoot_power(0),
-	human(human),
-	computer_mode(NONE),
-	ufo_sprite(getUfoSprite()),
-	cpkt_sprite(getCirclePktSprite()), 
-	c_think(Sprite("gfx/c_thinking.bmp", 2)), 
-	c_shoot(Sprite("gfx/c_shooting.bmp", 2))
-{
-	c_think.setFramerate(25);
-	c_think.setAlpha(150);
-	c_shoot.setFramerate(25);
-	c_shoot.setAlpha(150);
-}
-
-bool Ufo::isDead() { return (energy<=0) ? true : false ; }
-
-bool Ufo::isActive() { return active; }
-
-bool Ufo::isComputer() { return !human; }
-
-int Ufo::getX() { return x; }	
-
-int Ufo::getY() { return y; }
-
-int Ufo::getWidth() { return 49; }
-
-int Ufo::getEnergy() { return energy; }
-
-double Ufo::getShootAngle() { return shoot_angle; }
-
-Vector2d Ufo::getShootVector() { return Vector2d( shoot_power*SHOOTPOWERFACTOR, shoot_angle, P); }	
-
-Vector2d Ufo::getShootStart()
+double Spaceobject::get_X() const 
 { 
-	Vector2d me=Vector2d(x,y,K);
-	Vector2d p=Vector2d(60, shoot_angle, P);
-	Vector2d pos=me+p;
-	
-	return pos;
-}	
-
-void Ufo::resetEnergy() { energy=MAXENERGY; }
-
-void Ufo::subEnergy( int e ) { energy-=e; }
-
-void Ufo::incShootAngle() { shoot_angle+=PI/180; }
-
-void Ufo::decShootAngle() { shoot_angle-=PI/180; }
-
-void Ufo::incShootPower()
-{
-	shoot_power+=1;
-	if (shoot_power>MAXSHOOTPOWER) shoot_power=MAXSHOOTPOWER;
+	return x; 
 }
 
-void Ufo::activate() { active=true; shoot_power=0; }
-
-void Ufo::inactivate() { active=false; }
-
-void Ufo::moveN() { if (y>BORDERWIDTH) y=y-2; }	
-
-void Ufo::moveS() { if (y<SCREENHEIGHT-BORDERWIDTH) y=y+2; }	
-
-void Ufo::setComputer( int computer ) { human=!computer; computer_mode=NONE; }
-
-void Ufo::setPos( int x, int y )
-{
-	this->x=x;
-	this->y=y;
+double Spaceobject::get_Y() const 
+{ 
+	return y; 
 }
 
-bool Ufo::collision( int x, int y, int w )
+double Spaceobject::get_Width() const 
 {
-	bool r=false;
-	
-	int x2=getX();
-	int y2=getY();
-	int w2=getWidth();
-	int distCenter=(int)(sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2)));
-	int distRadius=(w+w2)/2;
-
-	if (distCenter <= distRadius) r=true;
-
-	return r;	
+	return width; 
 }
 
-bool Ufo::calculateComputerMove( Galaxy *galaxy, int target_x, int target_y, int target_width )
+double Spaceobject::get_Weight() const
 {
-	static Shoot s=Shoot();
-	static bool found=false;
-	static int searches=MAXCOMPUTERSEARCH;
-	static double rpow, rang, ypos;
-	bool canshoot=false;
-	computer_mode=NONE;
-	
-	// Zug suchen
-	if (!found) {
-		canshoot=false;
-		srand(time(NULL));
-		rpow=(int)((MAXSHOOTPOWER-1)*(rand()/(RAND_MAX+1.0))+1);
-		rang=2*PI*(rand()/(RAND_MAX+1.0));
-		ypos=(int)((SCREENHEIGHT-200)*(rand()/(RAND_MAX+1.0))+100);
-		
-		Vector2d vsta=Vector2d( (int)rpow*SHOOTPOWERFACTOR, rang, P);
-		Vector2d vpos=Vector2d( x, ypos, K )+Vector2d(60, rang, P);
-		found=s.hitEnemy( vpos, vsta, galaxy, target_x, target_y, (int)(target_width*COMPUTERSTRENGTH));
+	return weight;
+}
 
-		Vector2d vvv=Vector2d( target_x, target_y, K );
-		
-		#ifdef __DEBUG__ 
-		if (found) std::cout << "*** FEIND ENTDECKT BEI " <<  vvv << std::endl;
-		#endif
-		
-		if (--searches<0) found=true;
-		
-		if (!found) { 
-			computer_mode=THINKING;
-		}
-	}
+double Spaceobject::get_Speed() const
+{
+	return speed;
+}
 
-	// Schuss und Position einstellen
-	if (found && !canshoot) {
-		canshoot=true;
-		if ((int)ypos<y) {
-			canshoot=false;
-			moveN(); 
-			if ((int)ypos>y) y=(int)ypos;
-		}
-		if ((int)ypos>y) { 
-			canshoot=false;
-			moveS(); 
-			if ((int)ypos<y) y=(int)ypos;
-		}
+double Spaceobject::get_Direction() const
+{
+	return direction;
+}
 
-		if (rang>shoot_angle) { 
-			canshoot=false; 
-			incShootAngle(); 
-			if (rang<shoot_angle) shoot_angle=rang; 
-		}
-		if (rang<shoot_angle) {
-			canshoot=false;
-			decShootAngle(); 
-			if (rang>shoot_angle) shoot_angle=rang; 
-		}
-		if (canshoot && rpow>shoot_power) {
-			canshoot=false;
-			incShootPower();
-		}
-		if (!canshoot) {
-			computer_mode=SHOOTING;
-		}
-	}
-	
-	// Schuss
-	if (canshoot) {
-		computer_mode=NONE;
-		searches=MAXCOMPUTERSEARCH;
-		shoot_power=rpow;
-		found=false;
-		canshoot=false;
+double Spaceobject::get_Spacing() const
+{
+	return spacing;
+}
+
+bool Spaceobject::has_collision( Spaceobject *object )
+{
+	if ( check_collision( object->get_X(), object->get_Y(), object->get_Width() ) ) {
+		hit( object );
+		
 		return true;
 	}
 	
 	return false;
 }
 
+bool Spaceobject::check_collision( double x, double y, double width, bool spacing )
+{
+	double my_x=get_X();
+	double my_y=get_Y();
+	double my_width=get_Width();
+
+	if ( spacing ) 
+		my_width+=this->spacing;
+
+	double dist_Center=sqrt( (x-my_x)*(x-my_x) + (y-my_y)*(y-my_y) );
+	double dist_Radius=( width+ my_width )/2;
+
+	return dist_Center<=dist_Radius;	
+}
+
+void Spaceobject::draw() {}
+
+void Spaceobject::hit( Spaceobject *object ) {}
+
+/************************************************************************
+ *									*
+ * Planet								*
+ *									*
+ ************************************************************************/
+Planet::Planet( double x, double y ) 
+:
+	Spaceobject ( x, y ),
+	hit_vector( Vector_2( 0, 0, K ) )
+{	
+	char *planet_filename="";
+	planet_type=(Planettype)RANDOM(4,0);
+
+	switch ( planet_type ) {
+
+		case P_JUPITER:
+			planet_filename="gfx/jupiter.gif";
+			weight=WEIGHT_JUPITER;
+			spacing=50;
+			break;
+	
+		case P_EARTH:
+			planet_filename="gfx/earth.gif";
+			weight=WEIGHT_EARTH;
+			spacing=40;
+			break;
+			
+		case P_MARS:
+			planet_filename="gfx/mars.gif";
+			weight=WEIGHT_MARS;
+			spacing=30;
+			break;
+
+		case P_MOON:
+			planet_filename="gfx/moon.gif";
+			weight=WEIGHT_MOON;
+			spacing=10;
+	}
+	
+	planet_sprite=new Sprite( planet_filename );
+	width=(double)planet_sprite->getWidth()-2;	// Sub Anti-Alias Borders!
+}
+
+Planet::~Planet()
+{
+	delete planet_sprite;
+}
+
+void Planet::draw()
+{
+	if ( hit_vector.getLength() > 1 ) {
+		Vector_2 v=Vector_2( get_X(), get_Y(), K );
+		v+=hit_vector;
+		hit_vector=hit_vector.newLength( hit_vector.getLength()/2 );
+		set_Pos( v.getX(), v.getY() );
+	}
+
+	planet_sprite->setPos( (int)x, (int)y );
+	planet_sprite->draw();
+
+}
+
+void Planet::hit( Spaceobject *object )
+{
+	hit_vector=Vector_2( get_X(), get_Y(), K ) - Vector_2( object->get_X(), object->get_Y(), K );
+	hit_vector+=Vector_2( object->get_Speed(), object->get_Direction(), P );
+	hit_vector=hit_vector.newLength( 10/get_Weight()+2 );
+	
+	object->hit( this );
+}
+
+/************************************************************************
+ *									*
+ * Blackhole								*	
+ *									*
+ ************************************************************************/
+Blackhole::Blackhole( double x, double y ) 
+:
+	Spaceobject( x, y )
+{
+	hole_sprite=new Sprite( "gfx/hole.gif" );
+	width=-1;
+	weight=350;
+	spacing=150;
+	in_background=true;
+
+	for ( int i=0; i<MAXHOLE; i++ ) 
+		particles[i]=new Vector_2(
+			RANDOM(65,5), 
+			RANDOM(2*PI,0),
+			P );
+}
+
+Blackhole::~Blackhole() 
+{
+	delete hole_sprite;
+
+	for ( int i=0; i<MAXHOLE; i++ ) 
+		delete particles[i];
+}
+
+void Blackhole::draw() 
+{
+	static double hole_animPos=0;
+
+	double x_anim=RANDOM(1,-1);
+	double y_anim=RANDOM(1,-1);
+	
+	hole_sprite->setAlpha(30);
+	hole_sprite->setPos( (int)(x+x_anim), (int)(y+y_anim) );
+	hole_sprite->draw();
+
+	hole_animPos+=( 5*PI/180 );
+
+	if ( hole_animPos>2*PI )
+		hole_animPos-=2*PI;
+	else if ( hole_animPos<0 )
+		hole_animPos+=2*PI;
+
+	double t_speed=1;
+
+	SDL_LockSurface(MYSDLSCREEN);
+	
+	for (int i=0; i<MAXHOLE; i++) {
+		double t_len=particles[i]->getLength();
+		double t_ang=particles[i]->getAngle();
+
+		if ( ( t_ang-=PI/180*3 )<0 ) 
+			t_ang+=2*PI;
+		
+		if ( ( t_len-=t_speed/8+3 )<5 ) 
+			t_len+=60+RANDOM(5,-5);
+
+		delete particles[i];
+		particles[i]=new Vector_2( t_len, t_ang, P );
+
+		double f=cos( hole_animPos*PI/180 )/6+.75;
+		int xx=(int)( x+( particles[i]->getX())*f ) + Sprite::x_offset;
+		int yy=(int)( y+( particles[i]->getY())*f ) + Sprite::y_offset;
+
+		if (t_speed++>3 ) 
+			t_speed-=3;
+
+		int r=(int)( t_len*2 + 40 );
+		int g=r;
+		int b=20+(int)( t_len*2 + 20 );
+		
+		Sprite::putpixel( xx, yy, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
+
+		r/=2;
+		g/=2;
+		b/=2;
+		
+		if (t_len>50)
+			Sprite::putpixel( xx, yy+1, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
+		
+		if (t_len>70) {
+			Sprite::putpixel( xx+1, yy, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
+			Sprite::putpixel( xx+1, yy+1, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
+		}
+
+	}
+	
+	SDL_UnlockSurface(MYSDLSCREEN);
+}
+
+void Blackhole::hit( Spaceobject *object ) {}
+
+/************************************************************************
+ *									*
+ * Wormhole								*	
+ *									*
+ ************************************************************************/
+Wormhole::Wormhole( double x, double y ) 
+:
+	Spaceobject( x, y )
+{
+	width=25;
+	weight=50;
+	spacing=60;
+	in_background=true;
+	exit_x=RANDOM(350, 150);
+	exit_y=RANDOM(350, 150);
+	
+	if ( (int)RANDOM(2,0)==1 ) exit_x=-exit_x;
+	
+	if ( (int)RANDOM(2,0)==1 ) exit_y=-exit_y;
+
+	for ( int i=0; i<MAXWORM; i++ ) 
+		particles[i]=RANDOM(800,-30);
+
+	for ( int i=0; i<MAXWORM/15; i++ ) 
+		start_particles[i]=new Vector_2(
+			RANDOM( get_Width()*1.5, 5), 
+			RANDOM(2*PI,0),
+			P );
+}
+
+Wormhole::~Wormhole()
+{
+	for ( int i=0; i<MAXWORM/15; i++ ) 
+		delete start_particles[i];
+}
+
+void Wormhole::draw() 
+{
+	Vector_2 path_to_exit=Vector_2( exit_x, exit_y, K );
+	double path_len=path_to_exit.getLength();
+
+	static int mooover=0, mooover2=0;
+	static double xm=0, ym=0;
+	
+	if ( (mooover+=2)>360 ) mooover-=360;
+	
+	if ( (mooover2-=3)<0 ) mooover+=360;
+
+	SDL_LockSurface(MYSDLSCREEN);
+	
+	for (int i=0; i<MAXWORM; i++) {
+
+		double p=particles[i];
+
+		if ( ( p+= i%3+1 )>path_len )
+			p-=path_len;
+		
+		particles[i]=p;
+		
+		double rel_pos=p/path_len;
+		Vector_2 pos=path_to_exit.newLength(p);
+
+		// Magic Wormhole Formula =)))
+		pos+=Vector_2( 
+			( ( cos( (mooover+p*10+i*20)*PI/180 ) * 10 )
+			+
+			( cos( (mooover2+p*2)*PI/180 ) * 15 ) )
+			*
+			( ( cos( (rel_pos*360)*PI/180 ) ) ),
+			
+			pos.getAngle()-(PI/2), 
+			P );
+
+		if (p>0 && p<1) {
+			xm=pos.getX();	
+			ym=pos.getY();	
+		}
+			
+		// Color Factor (Fade out in the middle)
+		double cf=(cos( (p/path_len)*2*PI )+1) /3+0.25;
+		double xx, yy, rr, gg, bb;
+
+		xx=( get_X()+pos.getX() ) + Sprite::x_offset;
+		yy=( get_Y()+pos.getY() ) + Sprite::y_offset;
+		rr=( 255-( (255*p/path_len)/4 ) )*cf;
+		bb=gg=( 120+( (255*p/path_len)/4 ) )*cf;
+
+		Sprite::putpixel( (int)xx, (int)yy, SDL_MapRGB( MYSDLSCREEN->format, (int)rr, (int)gg, (int)bb ) );
+	}
+
+	Vector_2 p_to_moving_center=Vector_2( xm, ym, K );
+
+	for (int i=0; i<MAXWORM/15; i++ ) {
+		Vector_2 particle=Vector_2( start_particles[i]->getLength(), start_particles[i]->getAngle(), P );
+		Vector_2 part_to_mcenter=p_to_moving_center-particle;
+		particle+=part_to_mcenter.newLength( RANDOM(3,1) );	
+				
+		if (particle.getLength()<=8) {
+			particle=Vector_2(
+				RANDOM( get_Width()*1.5, get_Width()-10), 
+				RANDOM(2*PI,0),
+				P );
+		}
+
+		delete start_particles[i];
+		start_particles[i]=new Vector_2( particle.getX(), particle.getY(), K );
+
+		int rr=(int)(205*8/particle.getLength()+50);
+		int gg=(int)(100*8/particle.getLength()+0);
+		int bb=gg;
+
+		int xx=(int)( get_X()+particle.getX() ) + Sprite::x_offset;
+		int yy=(int)( get_Y()+particle.getY() ) + Sprite::y_offset;
+
+		Sprite::putpixel (xx, yy, SDL_MapRGB( MYSDLSCREEN->format, rr, gg, bb ) );
+	}
+	
+	SDL_UnlockSurface(MYSDLSCREEN);
+}
+
+void Wormhole::hit( Spaceobject *object )
+{
+	object->set_Pos( get_X()+exit_x, get_Y()+exit_y );
+}
+
+/************************************************************************
+ *									*
+ * Flying Saucer							*	
+ *									*
+ ************************************************************************/
+Ufo::Ufo( double x, double y )
+:
+	Spaceobject(),
+	player_id(Ufo::current_playerid),
+	is_human(false),
+	is_active(false),
+	is_locked(false),
+	shield_strength(MAXENERGY)
+{
+	reset();
+	
+	char *u_filename="", *c_filename="";
+	double angle=0;
+	
+	switch (Ufo::current_playerid++) {
+	
+		case 0:
+			x=BORDERWIDTH;
+			angle=0;
+			u_filename="gfx/ufored.gif";
+			c_filename="gfx/cpktred.gif";
+			break;	
+		case 1:
+			x=SCREENWIDTH-BORDERWIDTH;
+			angle=PI;
+			u_filename="gfx/ufoblue.gif";
+			c_filename="gfx/cpktblue.gif";
+			break;
+	}
+
+	set_Pos( x, y );
+	width=48;
+	
+	shoot_angle=angle;
+	shoot_power=0;
+	
+	ufo_shoot=new Shoot();
+	
+	ufo_sprite=new Sprite( u_filename, 25 );
+	circle_sprite=new Sprite( c_filename );
+
+	thinking_sprite=new Sprite( "gfx/c_thinking.gif", 2 );
+	thinking_sprite->setFramerate(25);
+	thinking_sprite->setAlpha(150);
+
+	shooting_sprite=new Sprite( "gfx/c_shooting.gif", 2 );
+	shooting_sprite->setFramerate(25);
+	shooting_sprite->setAlpha(150);	
+}
+
+Ufo::~Ufo() 
+{
+	delete ufo_sprite;
+	delete ufo_shoot;
+	delete circle_sprite;
+	delete thinking_sprite;
+	delete shooting_sprite;
+}
+
+bool Ufo::is_dead() const 
+{
+	return shield_strength<=0;
+}
+
+bool Ufo::is_Computer() const
+{
+	return !is_human;
+}
+
+int Ufo::get_Energy() const
+{
+	return shield_strength;
+}
+
+void Ufo::reset()
+{
+	shield_strength=MAXENERGY;
+	is_active=false;
+	is_locked=false;
+}
+
+void Ufo::set_Human()
+{
+	is_human=true;
+}
+
+void Ufo::set_Computer()
+{
+	is_human=false;
+}
+
+void Ufo::activate()
+{	
+	is_active=true;
+	is_locked=false;
+	shoot_power=0;
+}
+	
+void Ufo::deactivate()
+{
+	is_active=false;
+}
+
+void Ufo::move_Up()
+{
+	if (y>BORDERWIDTH) y=y-2;
+}
+
+void Ufo::move_Down()
+{
+	if ( is_active )
+		if (y<SCREENHEIGHT-BORDERWIDTH) y=y+2;
+}
+
+void Ufo::inc_ShootAngle()
+{
+	if ( is_active )
+		shoot_angle+=PI/180; 
+}
+
+void Ufo::dec_ShootAngle()
+{
+	if ( is_active )
+		shoot_angle-=PI/180; 
+}
+
+void Ufo::inc_ShootPower()
+{
+	if ( is_active )
+		if ( ++shoot_power>MAXSHOOTPOWER ) shoot_power=MAXSHOOTPOWER;
+}
+
+Shoot *Ufo::shoot()
+{
+	static Shoot *ufo_shoot=new Shoot();
+
+	if ( is_active ) {
+		Vector_2 v_start=Vector_2( get_X(), get_Y(), K )+Vector_2( 60, shoot_angle, P );
+		Vector_2 v_direction=Vector_2( shoot_power*SHOOTPOWERFACTOR, shoot_angle, P );
+
+		ufo_shoot->activate( v_start, v_direction );
+		
+		#ifdef __DEBUG__ 
+		__SHOOTS++;
+		//std::cout << __HITS << "/" << __SHOOTS << "=" << (int)(__HITS*100/__SHOOTS) << "%" << std::endl;
+		#endif
+	
+		return ufo_shoot;
+	}
+	
+	return NULL;
+}
+
+bool Ufo::calculate_Computer_Move( Galaxy *galaxy, int factor ) 
+{
+	static Shoot s=Shoot();
+	static bool found=false;
+	static int searches=MAXCOMPUTERSEARCH;
+	static double new_ShootPower, new_ShootAngle, new_y;
+	bool canshoot=false;
+	computer_mode=NONE;
+	
+	// Zug suchen
+	if (!found && !is_locked) {
+		canshoot=false;
+
+		// Randomize Shoot-configuration
+		new_y=(int)RANDOM( SCREENHEIGHT-200, 100 );
+		new_ShootPower=(int)RANDOM( MAXSHOOTPOWER , 10 );
+		new_ShootAngle=RANDOM( 2*PI, 0 );
+		
+		Vector_2 start=Vector_2( get_X(), new_y, K ) + Vector_2( 60, new_ShootAngle, P );
+		Vector_2 direction=Vector_2( new_ShootPower*SHOOTPOWERFACTOR, new_ShootAngle, P);
+
+		found=s.will_be_a_Hit( player_id, factor, start, direction, galaxy );
+		
+		#ifdef __DEBUG__ 
+		//if (found) std::cout << "*** FEIND ENTDECKT BEI MIT " <<  start << ", " << direction << std::endl;
+		#endif
+		
+		if (--searches<0) found=true;
+		
+		if (!found) computer_mode=THINKING;
+	}
+
+	// Schuss und Position einstellen
+	if (found && !canshoot) {
+		canshoot=true;
+
+		if ((int)new_y<y) {
+			canshoot=false;
+			move_Up(); 
+			if ((int)new_y>y) y=(int)new_y;
+		}
+
+		if ((int)new_y>y) { 
+			canshoot=false;
+			move_Down(); 
+			if ((int)new_y<y) y=(int)new_y;
+		}
+
+		if (new_ShootAngle>shoot_angle) { 
+			canshoot=false; 
+			inc_ShootAngle(); 
+
+			if (new_ShootAngle<shoot_angle) shoot_angle=new_ShootAngle; 
+		}
+
+		if (new_ShootAngle<shoot_angle) {
+			canshoot=false;
+			dec_ShootAngle(); 
+
+			if (new_ShootAngle>shoot_angle) shoot_angle=new_ShootAngle; 
+		}
+
+		if (canshoot && new_ShootPower>shoot_power) {
+			canshoot=false;
+			inc_ShootPower();
+		}
+
+		if (!canshoot) computer_mode=SHOOTING;
+	}
+
+	// Schuss
+	if (canshoot) {
+		computer_mode=NONE;
+		searches=MAXCOMPUTERSEARCH;
+		shoot_power=new_ShootPower;
+		canshoot=false;
+		galaxy->set_Shoot( shoot() );
+		found=false;
+		is_locked=true;
+		
+		return true;
+	}
+	
+	return false;
+
+}
+
 void Ufo::draw() 
 {
-	ufo_sprite.setPos( x-2, y+10 );
-	ufo_sprite.draw();
+	ufo_sprite->setPos( (int)(this->get_X()-2), (int)(get_Y()+10) );
+	ufo_sprite->draw();
 	
-	if (isActive()) drawCircle();
+	draw_Targetmode();
 
-	if (isComputer()) { 
+	draw_Computermode();
+}
+
+void Ufo::hit( Spaceobject *object )
+{
+	#ifdef __DEBUG__ 
+	__HITS++;
+	std::cout << __HITS << "/" << __SHOOTS << "=" << (int)(__HITS*100/__SHOOTS) << "%" << std::endl;
+	#endif
+	
+	shield_strength-=(int)object->get_Speed()/10;
+	
+	if (shield_strength<0) 
+		shield_strength=0;
+
+	object->hit( this );
+}
+
+void Ufo::draw_hint( Galaxy *galaxy )
+{
+	Vector_2 start=Vector_2( get_X(), get_Y(), K ) + Vector_2( 60, shoot_angle, P );
+	Vector_2 direction=Vector_2( 100*SHOOTPOWERFACTOR, shoot_angle, P );
+	
+	ufo_shoot->draw_hint( start, direction, galaxy ); 
+}
+
+void Ufo::draw_Targetmode()
+{	
+	if (is_active) {
+
+		Vector_2 m=Vector_2(x, y, K);
+		double distance=30;
+		int alpha=150;
+		
+		for (int i=0; i<5; i++) {
+
+			if ( (int)( shoot_power/20 )>i ) circle_sprite->setAlpha( alpha+105 );
+			else circle_sprite->setAlpha(alpha);
+
+			Vector_2 pos=m+Vector_2( distance, shoot_angle, P );
+			circle_sprite->setPos( (int)pos.getX(), (int)pos.getY() );
+			circle_sprite->draw();
+
+			alpha-=20;
+			distance+=10;
+		}
+	
+	}
+}
+
+void Ufo::draw_Computermode()
+{
+	if ( is_Computer() ) { 
+		
 		switch (computer_mode) {
+		
 			case THINKING: 
-				c_think.setPos(getX(), getY());
-				c_think.draw();
+				thinking_sprite->setPos( (int)get_X(), (int)get_Y() );
+				thinking_sprite->draw();
 				break;
+			
 			case SHOOTING:
-				c_shoot.setPos(getX(), getY());
-				c_shoot.draw();
+				shooting_sprite->setPos( (int)get_X(), (int)get_Y() );
+				shooting_sprite->draw();
 				break;
-			case NONE: 
+			default:
 				break;
+		}
+	}
+}	
+
+int Ufo::current_playerid=0;
+
+
+/************************************************************************
+ *									*
+ * Explosion								*	
+ *									*
+ ************************************************************************/
+Explosion::Explosion( double x, double y )
+:
+	Spaceobject( x, y ),
+	exploding(false)
+{
+	explosion_sprite=new Sprite( "gfx/explosionanim.gif", 6 );
+	explosion_sprite->setAlpha(230);
+	explosion_sprite->setRepeatmode(false);
+	explosion_sprite->setFramerate(1);
+}
+
+Explosion::~Explosion()
+{
+	delete explosion_sprite;
+}
+
+bool Explosion::is_active() const
+{
+	return exploding;
+}
+
+void Explosion::activate( double x, double y )
+{
+	set_Pos( x, y );
+	explosion_sprite->setPos( (int)x, (int)y );
+	explosion_sprite->resetFrames();
+	exploding=true;
+	
+	sound->play(EXPLOSION);
+}
+
+void Explosion::draw()
+{
+	if ( is_active() ) {
+		explosion_sprite->draw();
+		exploding=!explosion_sprite->is_onLastFrame();
+	}	
+}
+
+void Explosion::hit( Spaceobject *object ) {}
+
+/************************************************************************
+ *									*
+ * Shoot								*	
+ *									*
+ ************************************************************************/
+Shoot::Shoot( double x, double y )
+:
+	Spaceobject( x, y ),
+	is_exploding(false),
+	moving_time(0),
+	last_shootPos( Vector_2(0,0,K) ),
+	pre_calculated_Steps(0)
+{
+	width=8;
+	
+	laser_sprite=new Sprite( "gfx/shoot.gif" );
+	laserback_sprite=new Sprite( "gfx/shootback.gif" );
+	explosion=new Explosion();
+}
+
+Shoot::~Shoot()
+{
+	delete laser_sprite;
+	delete laserback_sprite;
+	delete explosion;
+}
+	
+bool Shoot::is_active()
+{
+	return moving_time>0;
+}
+
+bool Shoot::will_be_a_Hit( int player_id, double factor, Vector_2 start, Vector_2 direction, Galaxy *galaxy )
+{
+	calculate_ShootPath( start, direction, galaxy );
+	
+	for (int i=0; i<pre_calculated_Steps; i++) {
+
+		if ( galaxy->is_Ufo_In_Area( player_id, pre_calculated_Pos[i].x, pre_calculated_Pos[i].y, factor ) )
+			
+			return true;		
+	}
+		
+	return false;
+}
+
+void Shoot::activate( Vector_2 start, Vector_2 vector )
+{
+	set_Pos( start.getX(), start.getY() );
+	direction=vector.getAngle();
+	speed=vector.getLength();
+	last_shootPos=start;
+	is_exploding=false;
+	moving_time=MAXSHOOTRUN;
+
+	sound->play(SHOOT);
+}
+
+void Shoot::destroy()
+{
+	if ( is_active() )
+		hit( this );
+}
+
+bool Shoot::move( Galaxy *galaxy )
+{
+	if ( is_active() ) {
+		if ( --moving_time==0 ) return true;
+	
+		Vector_2 my_shootPos=Vector_2( get_X(), get_Y(), K );
+		Vector_2 my_shootVector=Vector_2( speed, direction, P );
+		last_shootPos=my_shootPos;
+		
+		galaxy->calculate_nextPos( my_shootPos, my_shootVector );
+
+		x=my_shootPos.getX();
+		y=my_shootPos.getY();
+		speed=my_shootVector.getLength();
+		direction=my_shootVector.getAngle();
+		
+		if ( galaxy->has_collision( this ) &&
+			!is_active() )
+			
+			return true;
+	}
+	
+	return false;
+}
+
+void Shoot::draw_hint( Vector_2 start, Vector_2 direction, Galaxy *galaxy )
+{
+	static int colorpos=50;
+	
+	if ( (colorpos-=20)<50 ) colorpos=255;
+	
+	calculate_ShootPath( start, direction, galaxy );
+	
+	int c=colorpos;
+	
+	SDL_LockSurface( MYSDLSCREEN );
+
+	for (int i=0; i<pre_calculated_Steps; i++) {
+		Sprite::putpixel( 
+			pre_calculated_Pos[i].x+Sprite::x_offset,
+			pre_calculated_Pos[i].y+Sprite::y_offset,
+			SDL_MapRGB( MYSDLSCREEN->format, c, c, c ) );
+
+		if ((c+=30)>255) c=50;
+	}
+
+	SDL_UnlockSurface( MYSDLSCREEN );
+}
+
+void Shoot::draw()
+{
+	if ( is_active() ) {
+
+		if ( moving_time>100 ||
+			(int)RANDOM(100, 0)<( moving_time/2 )+25 ) {
+			
+			double x_anim=RANDOM(2, -2);
+			double y_anim=RANDOM(2, -2);
+			int alpha_anim=(int)RANDOM(10, -10);
+			
+			laserback_sprite->setAlpha( 160+alpha_anim );
+			laserback_sprite->setPos(
+				(int)( ( get_X()+last_shootPos.getX() )/2 + x_anim ),
+				(int)( ( get_Y()+last_shootPos.getY() )/2 + y_anim ) );				
+			laserback_sprite->draw();
+			
+			laser_sprite->setAlpha( 200+alpha_anim );
+			laser_sprite->setPos( (int)get_X(), (int)get_Y() );
+			laser_sprite->draw();
+		}
+
+	}
+	
+	if ( is_exploding ) {
+		explosion->draw();
+		is_exploding=explosion->is_active();
+	}
+}
+
+void Shoot::hit( Spaceobject *object )
+{
+	explosion->activate( x, y );
+	is_exploding=true;
+	moving_time=0;
+}
+
+void Shoot::calculate_ShootPath( Vector_2 start, Vector_2 direction, Galaxy *galaxy )
+{
+	static Vector_2 last_angle=Vector_2( 0, 0, K );
+	static Vector_2 last_shoot=Vector_2( 0, 0, K );
+
+	if ( last_angle!=direction || last_shoot!=start ) {
+
+		pre_calculated_Steps=0;
+		last_angle=direction;
+		last_shoot=start;
+		
+		for (int i=0; i<MAXPRECALC; i++) {
+			galaxy->calculate_nextPos( start, direction );
+			double x=start.getX();
+			double y=start.getY();
+			
+			if ( !galaxy->check_collision( x, y, get_Width() ) ) {	
+				pre_calculated_Pos[i].x=(int)x;
+				pre_calculated_Pos[i].y=(int)y; 
+				pre_calculated_Steps++;
+			} else break; 
 		}
 	}
 }
 
-Sprite Ufo::getUfoSprite()
+/************************************************************************
+ *									*
+ * Galaxy								*
+ *									*
+ ************************************************************************/
+Galaxy::Galaxy( int max, int id )
+:
+	is_imploding(false),
+	objects_in_galaxy(0),
+	ufos_in_galaxy(0)
 {
-	char* filename="";
-	static int member_of_game=0;
+	create( max, id );
+
+	shoot=NULL;
+}
 	
-	switch (member_of_game) {
-		case 0:
-			filename="gfx/ufored.bmp";
-			break;	
-		case 1:
-			filename="gfx/ufoblue.bmp";
-			break;	
-	}
-
-	member_of_game++;
-
-	return Sprite(filename,25);
+Galaxy::~Galaxy()
+{
+	for (int i=0; i<objects_in_galaxy; i++) delete objects[i];	
 }
 
-Sprite Ufo::getCirclePktSprite()
+double Galaxy::get_ShootX() const
 {
-	char* filename="";
-	static int member_of_game=0;
+	return ( shoot==NULL ) ? 0 : shoot->get_X();
+}
 	
-	switch (member_of_game) {
-		case 0:
-			filename="gfx/cpktred.bmp";
-			break;	
-		case 1:
-			filename="gfx/cpktblue.bmp";
-			break;	
-	}
-
-	member_of_game++;
-
-	return Sprite(filename);
+double Galaxy::get_ShootY() const
+{
+	return ( shoot==NULL ) ? 0 : shoot->get_Y();
 }
 
-void Ufo::drawCircle() 
+bool Galaxy::is_ShootActive() const
 {
-	Vector2d m=Vector2d(x, y, K);
-	double ss=30;
-
-	int a=150;
+	return ( shoot==NULL ) ? false : shoot->is_active();
+}
 	
-	for (int i=0; i<5; i++) {
-		if ((int)(shoot_power/20)>i) cpkt_sprite.setAlpha(a+105);
-		else cpkt_sprite.setAlpha(a);
-		a-=20;
-		Vector2d pos=m+Vector2d(ss, shoot_angle, P);
-		cpkt_sprite.setPos( (int)pos.getX(), (int)pos.getY() );
-		cpkt_sprite.draw();
-		ss+=10;
+bool Galaxy::is_Imploding() const
+{
+	return is_imploding;
+}
+
+bool Galaxy::is_Ufo_In_Area( int player_id, double x, double y, double factor )
+{
+	for (int i=0; i<MAXPLAYER; i++) {
+
+		if ( i!=player_id ) {
+			if ( ufos[i]->check_collision( x, y, 8*factor ) ) return true;
+		}
+	}
+	
+	return false;
+}
+
+void Galaxy::set_Ufos( Ufo **ufos, int max ) 
+{
+	this->ufos=ufos;
+	ufos_in_galaxy=max;	
+}
+
+void Galaxy::set_Shoot( Shoot *shoot )
+{
+	if ( shoot!=NULL ) {
+		this->shoot=shoot;
 	}
 }
 
-Explosion::Explosion() :
-	active(false),
-	expl_sprite(Sprite("gfx/explosionanim.bmp",6))
-{}
-
-void Explosion::activate( int x, int y ) 
+void Galaxy::kill_all_Shoots() 
 {
-	this->x=x;
-	this->y=y;
-	counter=50;
-	active=true;
-	expl_sprite.setFramerate(1);
-	expl_sprite.setAlpha(230);
-	expl_sprite.setRepeatmode(false);
-	expl_sprite.resetFrames();
-	sound.play(EXPLOSION);	
+	if ( shoot!=NULL ) shoot->destroy();
 }
 
-void Explosion::draw() 
+bool Galaxy::has_collision( Spaceobject *object )
 {
-	if (active) {
-		if (counter-->0) {
-			expl_sprite.setPos( x, y );
-			expl_sprite.draw();
-		} else {
-			active=false;
-		}	
-	}	
+	for (int i=0; i<objects_in_galaxy; i++ )
+
+		if ( objects[i]->has_collision(object) ) return true;
+
+	for (int i=0; i<ufos_in_galaxy; i++ )
+
+		if ( ufos[i]->has_collision(object) ) return true;
+
+	return false;
+}
+	
+bool Galaxy::check_collision( double x, double y, double width, bool spacing )
+{
+	for (int i=0; i<objects_in_galaxy; i++ ) 
+
+		if ( objects[i]->check_collision( x, y, width, spacing ) ) 
+
+			return true;
+
+	return false;
+}
+
+bool Galaxy::create( int max, int id )
+{
+	if ( !is_imploding ) {
+		srand(id);
+		
+		for ( int i=0; i<objects_in_galaxy; i++ )
+			delete objects[i];
+
+		objects_in_galaxy=0;
+		max=( max<MAXPLANETS ) ? max : MAXPLANETS;
+		
+		for (int i=0; i<max; i++ ) {
+			double x_test, y_test, width_test;
+			Spaceobject *tmp_planet=NULL;
+			int type_of_planet=(int)RANDOM(8,0);
+
+			//std::cout << "PLANETTYPE=" << type_of_planet << std::endl;
+
+			switch ( type_of_planet ) {
+				
+				case 5: 
+					tmp_planet=new Blackhole();
+					break;
+				case 6: 
+					tmp_planet=new Wormhole();
+					break;
+				default:
+					tmp_planet=new Planet();
+			}
+			
+			do {	
+				x_test=RANDOM( SCREENWIDTH-175, 175 );
+				y_test=RANDOM( SCREENHEIGHT-20, +10 );
+				width_test=tmp_planet->get_Width() + tmp_planet->get_Spacing();
+			} while ( check_collision( x_test, y_test, width_test, true ) );
+
+			tmp_planet->set_Pos( x_test, y_test );
+			animate_position[i].y=y_test;
+			objects[objects_in_galaxy++]=tmp_planet;
+		}
+
+		for (int i=0; i<objects_in_galaxy; i++)
+			objects[i]->set_Pos( objects[i]->get_X(), -600 );
+
+		is_imploding=true;
+		
+		sound->play(WARPGALAXY);
+
+		return true;
+	}
+	
+	return false;
+}
+	
+void Galaxy::calculate_nextPos( Vector_2 &position, Vector_2 &direction )
+{
+	Vector_2 vec_toPlanets=Vector_2( 0, 0, K );
+
+	for (int i=0; i<objects_in_galaxy; i++) {
+		// Vektor zum aktuellen Planeten
+		Vector_2 vec_PlanetPos=Vector_2( objects[i]->get_X(), objects[i]->get_Y(), K);
+		// Abstand zu unserem Schuss
+		double distance=vec_PlanetPos.distance(position);
+		// Vektor vom Schuss zum Planeten:
+		Vector_2 vec_toPlanet=vec_PlanetPos-position;
+		// Neue Laenge fuer den Vector
+		// (Anziehungskraft ergibt sich physikalisch ;)
+		vec_toPlanet=vec_toPlanet.newLength( objects[i]->get_Weight()/distance );
+		// gemeinsamen Anziehungsvektor aller Planeten erstellen:
+		vec_toPlanets=vec_toPlanets+vec_toPlanet;
+	}
+	// Alle Anziehungsvektoren werden zum Schussvektor addiert
+	direction+=vec_toPlanets;
+
+	// Neuen Schussvektor zur Schussposition addieren:
+	position+=direction.newLength( direction.getLength()*SHOOT_INTERVAL/1000 );
+}
+		
+bool Galaxy::animate()
+{
+	if ( shoot!=NULL )
+		
+		if ( shoot->move(this) )
+			return true;
+
+	return false;
+}
+
+void Galaxy::draw()
+{
+	is_imploding=animate_BigBang();
+	
+	for (int i=0; i<objects_in_galaxy; i++)
+
+		if (objects[i]->is_in_Background())
+			objects[i]->draw();
+
+	for (int i=0; i<objects_in_galaxy; i++)
+
+		if (!objects[i]->is_in_Background())
+			objects[i]->draw();
+
+	for (int i=0; i<ufos_in_galaxy; i++)
+		ufos[i]->draw();
+
+	if ( shoot!=NULL )
+		shoot->draw();
+}
+
+bool Galaxy::animate_BigBang() 
+{
+	bool still_moving=false;
+
+	if (is_imploding) {
+	
+		for (int i=0; i<objects_in_galaxy; i++) {
+			double object_y=objects[i]->get_Y();
+			double object_final_y=animate_position[i].y;
+			
+			if (object_final_y>object_y) {
+				still_moving=true;
+				object_y=object_y+( (object_final_y-object_y)/10+1 );
+				
+				if ( object_final_y<object_y ) object_y=object_final_y;
+			}
+			
+			objects[i]->set_Pos( objects[i]->get_X(), object_y);
+		}
+	}
+	
+	return still_moving;
+	
 }
 
