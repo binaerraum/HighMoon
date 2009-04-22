@@ -33,32 +33,38 @@
 
 #include <iostream>
 
-enum Languagetype { ENGLISH=0, GERMAN=1 };
+enum Languagetype {
+	ENGLISH=0,
+	GERMAN=1,
+	FRENCH=2,
+	POLISH=3,
+	PORTUGUESE=4
+};
 
 class Language
 {
 public:
-	Language() : language(ENGLISH) {};
+	Language();
 	
 	void toggle();
 	
-	char* getWindowtext();
+	char* getWindowtext() const;
 	
-	std::string getTitletext( int id );
+	std::string getTitletext( int id ) const;
 
-	std::string getScrollertext();
+	std::string getScrollertext() const;
 	
-	std::string getPlayertext( int id );
+	std::string getPlayertext( int id ) const;
 	
-	std::string getComputertext( int strength );
+	std::string getComputertext( int strength ) const;
 	
-	std::string getShieldtext(  int energy );
+	std::string getShieldtext(  int energy ) const;
 	
-	std::string getWinnertext( int winner );
+	std::string getWinnertext( int winner ) const;
 	
-	std::string getWarptext( int seed, int planets );
+	std::string getWarptext( int seed, int planets ) const;
 
-	std::string getWarptext();
+	std::string getWarptext() const;
 	
 private:
 	Languagetype language;

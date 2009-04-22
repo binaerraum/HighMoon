@@ -62,6 +62,8 @@ Language language;
 Soundset *sound;
 Font *font;
 
+bool VERBOSE=false; void verbose( std::string info ) { if (VERBOSE) std::cout << info << std::endl; }
+
 //-----------------------------------------------------------------------------------------
 class Gametimer 
 //-----------------------------------------------------------------------------------------
@@ -102,8 +104,11 @@ public:
 		computerstrength(2),
 		show_winner_time(WINNINGWAIT)
 	{
+		verbose( "Initializing Playfield" ); 
+
 		stars=new Star[MAXSTARS];
 		goldrain=new Goldrain[MAXGOLDRAIN];
+		shooting_star=new Shootingstar();
 
 		for (int i=0; i<MAXPLAYER; i++) players[i]=new Ufo( SCREENWIDTH/2, SCREENHEIGHT/2 );
 
@@ -115,6 +120,7 @@ public:
 	{
 		delete[] stars;
 		delete[] goldrain;
+		delete shooting_star;
 		for (int i=0; i<MAXPLAYER; i++) delete players[i];
 		delete galaxy;
 	}
@@ -172,6 +178,8 @@ public:
 	
 	void play() 
 	{
+		verbose( "Starting Gameloop" ); 
+
 		Gametimer timer=Gametimer(TICK_INTERVAL_GAME);
 
 		bool p_mode[]={false,false};
@@ -377,6 +385,7 @@ private:
 	int blink;
 	int active_player, winner_is_player;
 	Star *stars;
+	Shootingstar *shooting_star;
 	Goldrain *goldrain;
 	Ufo *players[MAXPLAYER];
 	Galaxy *galaxy;
@@ -438,6 +447,8 @@ private:
 		for (int i=0; i<MAXSTARS; i++)
 			stars[i].draw();
 
+		shooting_star->draw();
+
 		SDL_UnlockSurface( MYSDLSCREEN );		
 	}	
 	
@@ -463,7 +474,7 @@ private:
 			switch (i) {
 			
 				case 1:
-					x_pos=SCREENWIDTH-255;
+					x_pos=SCREENWIDTH-280;
 					y_pos=30;
 					break;
 				default:
@@ -635,8 +646,8 @@ int main(int argc, char *argv[])
 				<< __BLUE << WEBSITE << __NORMAL
 				<< std::endl
 				<< "Usage: "
-				<< argv[0] 
-				<< " [--help|--version|--fullscreen|--videoinfo]" << std::endl
+				<< argv[0]
+				<< " [-h --help|-v --version|-f --fullscreen|--videoinfo|--verbose]" << std::endl
 				<< __RED
 				<< "[1]     Player vs Computer" << std::endl 
 				<< "[2]     Player vs Player" << std::endl 
@@ -647,7 +658,7 @@ int main(int argc, char *argv[])
 				<< "[RIGHT] Increase Shootangle" << std::endl 
 				<< "[SPACE] Keep pressed to increase Power. Release for shooting." << std::endl 
 				<< "[F1]    Toggle Help-Scroller on/off" << std::endl 
-				<< "[F2]    Toggle Language English/German" << std::endl 
+				<< "[F2]    Toggle Language English/German/French/Polish/Portuguese" << std::endl 
 				<< "[C]     Toggles Computerstrength (Trainee...Insane)" << std::endl 
 				<< "[F]     Toggle Window/Fullscreen" << std::endl 
 				<< "[S]     Toggle Sound on/off" << std::endl
@@ -665,16 +676,23 @@ int main(int argc, char *argv[])
 			param_ok=true;
 		}
 		
+		if ( arg==(std::string)"--verbose" ) {
+			VERBOSE=true;
+			param_ok=true;
+		}
+		
 		if ( !param_ok ) {
-			std::cout << "Unknown parameter: " << arg << std::endl;
+			std::cout << arg << ": Unknown option." << std::endl;
 			exit(1);
 		}
 	}
 	
     	if( SDL_Init( SDL_INIT_VIDEO 
+		
 	#ifdef __THREADS__
 	| SDL_INIT_EVENTTHREAD 
 	#endif
+	
 	| SDL_INIT_AUDIO ) == -1 ) {
 		std::cout << "Can't init SDL: " << SDL_GetError() << std::endl;
 	       	exit(1);
@@ -708,7 +726,9 @@ int main(int argc, char *argv[])
 		videoflags|= SDL_HWSURFACE | SDL_DOUBLEBUF;
 	else videoflags|= SDL_SWSURFACE;
 
+	#ifdef __LINUX__
 	SDL_WM_SetIcon(IMG_Load("gfx/highmoon.png"), NULL );
+	#endif
 
     	if ( ( MYSDLSCREEN = SDL_SetVideoMode( SCREENWIDTH, SCREENHEIGHT, 0, videoflags ) ) == NULL ) {
 		std::cout << "Can't set video mode: " << SDL_GetError() << std::endl;

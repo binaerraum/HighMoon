@@ -8,6 +8,16 @@
 HighMoon - Duell im All.
 Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
+2005 February 04
+----------------
+HighMoon v1.1.2 - Some changes in Graphics (Wormholes, Blackholes,
+Planettextures, Background etc.) Adjustment of some Constants.
+Added French, Polish and Portuguese Language.
+
+HighMoon v1.1.2 - Kleinere Aenderungen an der Grafik (Wormloecher,
+Schwarze Loecher, Background etc.). Kleine Aenderung an den 
+Konstanten. Franzoesisch, Polnisch und Portugiesisch hinzugefuegt.
+
 2005 January 30:
 ----------------
 HighMoon v1.1.1 - Planets got Moons and Rings. Fixed a little
@@ -20,7 +30,7 @@ Bug mit franzoesischem Tastaturlayout behoben.
 ----------------
 HighMoon v1.1 - Restructured Galaxy-Objects. It is much easier now
 to add new Weapons and Spaceobjects. Changed the look of Wormholes.
-Removed Bug in AI - now Computermoves will be founded much faster.
+Removed Bug in AI - now Computermoves will be calculated much faster.
 Shielddamage now depends on the Shoot. Added commandline Options 
 -h (--help), -v (--version), -f (--fullscreen) and -vi (--videoinfo).
 Score will fade down if the Flying Saucer is behind it. Added some

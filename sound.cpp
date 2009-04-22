@@ -32,6 +32,8 @@ bool Soundset::soundOn=true;
 
 Soundset::Soundset()
 {
+	verbose( "Initializing Soundset" );
+
 	char* SOUNDSETNAMES[]={ 
 		"snd/explosion.wav",	// 0
 		"snd/laser.wav",    	// 1
@@ -67,11 +69,9 @@ void Soundset::play(SoundId id)
 		int index;
 
 		// einen leeren Audio-Slot suchen
-		for ( index=0; index<NUMBEROFCHANNELS; ++index ) {
-			if ( sounds[index].dpos == sounds[index].dlen ) {
+		for ( index=0; index<NUMBEROFCHANNELS; ++index )
+			if ( sounds[index].dpos == sounds[index].dlen )
 				break;
-			}
-		}
 		
 		if ( index < NUMBEROFCHANNELS ) {
 			
@@ -126,7 +126,9 @@ void Soundset::mixAudio( void *, Uint8 *stream, int length )
 {
 	for ( int i=0; i<NUMBEROFCHANNELS; ++i ) {
 		Uint32 size = (sounds[i].dlen-sounds[i].dpos);
+	
 		if ( size > (Uint32)length ) size = length;
+		
 		SDL_MixAudio( stream, &sounds[i].data[ sounds[i].dpos ], size,
 			(soundOn) ? SDL_MIX_MAXVOLUME : 0 );
 		sounds[i].dpos += size;

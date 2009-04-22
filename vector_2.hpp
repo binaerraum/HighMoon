@@ -63,6 +63,10 @@ public:
 	Vector_2 operator+( Vector_2 );
 	Vector_2& operator-=( Vector_2 );
 	Vector_2 operator-( Vector_2 );
+	Vector_2& operator*=( double );
+	Vector_2 operator*( double );
+	Vector_2& operator/=( double );
+	Vector_2 operator/( double );
 	
 	double distance( Vector_2 );
 	double projectOn( double );

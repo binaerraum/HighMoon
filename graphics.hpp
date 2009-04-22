@@ -61,8 +61,8 @@ private:
 	SDL_Surface *font_image;
 	SDL_Rect src, dst;
 
-	int font_pos[64];
-	int font_width[64];
+	int font_pos[96];
+	int font_width[96];
 };
 
 /******************************************************************************************
@@ -127,7 +127,7 @@ public:
 	void draw();
 	
 private:
-	int x, y, b, c, sp;
+	int x, y, b, c;
 
 	int rx();
 
@@ -136,6 +136,34 @@ private:
 	int color();
 	
 	int blink();
+
+};
+
+/******************************************************************************************
+ *
+ * Shootingstar
+ *
+ * A little Backgroud-Effect
+ *
+ ******************************************************************************************/
+class Shootingstar
+{
+public:
+	Shootingstar();
+
+	void draw();
+	
+private:
+	double x, y, s;
+	int w;
+
+	double rx();
+
+	double ry();
+	
+	double speed();
+	
+	int wait();
 
 };
 
@@ -159,9 +187,9 @@ private:
 	double x, y, sp, xoffset, yoffset;
 	int b, cr, cg, cb ;
 	
-	int rx();
+	double rx();
 
-	int ry();
+	double ry();
 	
 	double speed();
 

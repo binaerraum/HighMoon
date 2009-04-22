@@ -32,13 +32,10 @@
 
 #include <SDL/SDL.h>
 
-//#define __DEBUG__
-//#define __THREADS__	
-#define __LINUX__	// Actually, this has no Effect.
-//#define __WIN32__
-//#define __MACOSX__
+//#define __DEBUG__	// Print out Some Debug Information
+//#define __THREADS__	// Tested Threads
 
-const std::string VERSION="1.1.1";
+const std::string VERSION="1.1.2";
 const std::string COPYRIGHT="Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>";
 const std::string WEBSITE="http://highmoon.gerdsmeier.net";
 
@@ -88,16 +85,16 @@ const int MAXGOLDRAIN=150;		// Pixels in Goldrain
 const int MAXSTARS=100;			// Stars in Background
 
 // PLANETS
-const int MAXPLANETS=8;			// max. Planets in a Galaxy
-const int MINPLANETS=4;			// min. -"-
+const int MAXPLANETS=9;		// max. Planets in a Galaxy
+const int MINPLANETS=5;			// min. -"-
 const int WEIGHT_JUPITER=350;		// Weight is important for the gravity!
 const int WEIGHT_EARTH=300;
 const int WEIGHT_MARS=200;
-const int WEIGHT_GRAY=180;
-const int WEIGHT_GREEN=250;
-const int WEIGHT_BLACKHOLE=350;
-const int WEIGHT_WORMHOLE=50;
-const int MAXSTONES=30;
+const int WEIGHT_VENUS=180;
+const int WEIGHT_SATURN=250;
+const int WEIGHT_BLACKHOLE=450;
+const int WEIGHT_WORMHOLE=100;
+const int MAXSTONES=35;
 
 // SHOOT
 const int MAXSHOOTS=1;			// Shoots per Player (Don't change!)
@@ -121,6 +118,8 @@ enum SoundId {
 	HITUFO=4,
 	NEWGAME=5
 };
+
+extern void verbose( std::string info );
 
 #define RANDOM(max,min) ((max-min)*(rand()/(RAND_MAX+1.0))+min)
 

@@ -142,6 +142,8 @@ Stone::Stone( double x, double y, double angle )
 :
 	Spaceobject ( x, y )
 {
+	verbose( "Initializing Stone" );
+
 	pos_1=RANDOM(2*PI,0);
 	distance=0;
 
@@ -240,6 +242,8 @@ Planet::Planet( double x, double y )
 	Spaceobject ( x, y ),
 	hit_vector( Vector_2( 0, 0, K ) )
 {	
+	verbose( "Initializing Planet" );
+
 	char *planet_filename="";
 	planet_type=(Planettype)RANDOM(5,0);
 
@@ -249,35 +253,35 @@ Planet::Planet( double x, double y )
 			planet_filename="gfx/jupiter.gif";
 			weight=WEIGHT_JUPITER;
 			spacing=100;
-			objects_of_planet=3;
+			objects_of_planet=(int)RANDOM(4,1);
 			break;
 	
 		case P_EARTH:
 			planet_filename="gfx/earth.gif";
 			weight=WEIGHT_EARTH;
 			spacing=80;
-			objects_of_planet=1;
+			objects_of_planet=(int)RANDOM(2,0);
 			break;
 			
 		case P_MARS:
 			planet_filename="gfx/mars.gif";
 			weight=WEIGHT_MARS;
+			spacing=60;
+			objects_of_planet=(int)RANDOM(2,0);
+			break;
+
+		case P_VENUS:
+			planet_filename="gfx/venus.gif";
+			weight=WEIGHT_VENUS;
 			spacing=30;
 			objects_of_planet=0;
 			break;
 
-		case P_GRAY:
-			planet_filename="gfx/gray.gif";
-			weight=WEIGHT_GRAY;
-			spacing=30;
-			objects_of_planet=0;
-			break;
-
-		case P_GREEN:
-			planet_filename="gfx/green.gif";
-			weight=WEIGHT_GREEN;
+		case P_SATURN:
+			planet_filename="gfx/saturn.gif";
+			weight=WEIGHT_SATURN;
 			spacing=70;
-			objects_of_planet=MAXSTONES;
+			objects_of_planet=objects_of_planet=(int)RANDOM(MAXSTONES,20);
 	}
 	
 	planet_sprite=new Sprite( planet_filename );
@@ -355,6 +359,8 @@ Blackhole::Blackhole( double x, double y )
 :
 	Spaceobject( x, y )
 {
+	verbose( "Initializing Blackhole" );
+
 	hole_sprite=new Sprite( "gfx/hole.gif" );
 	width=-1;
 	weight=350;
@@ -410,7 +416,7 @@ void Blackhole::draw()
 		if ( ( t_ang-=PI/180*3 )<0 ) 
 			t_ang+=2*PI;
 		
-		if ( ( t_len-=t_speed/8+3 )<5 ) 
+		if ( ( t_len-=t_speed/8+3 )<7 ) 
 			t_len+=60+RANDOM(5,-5);
 
 		delete particles[i];
@@ -433,10 +439,10 @@ void Blackhole::draw()
 		g/=2;
 		b/=2;
 		
-		if (t_len>50)
+		if (t_len>30)
 			Sprite::putpixel( xx, yy+1, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
 		
-		if (t_len>70) {
+		if (t_len>50) {
 			Sprite::putpixel( xx+1, yy, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
 			Sprite::putpixel( xx+1, yy+1, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
 		}
@@ -457,6 +463,8 @@ Wormhole::Wormhole( double x, double y )
 :
 	Spaceobject( x, y )
 {
+	verbose( "Initializing Wormhole" );
+
 	width=25;
 	weight=50;
 	spacing=60;
@@ -495,11 +503,10 @@ void Wormhole::draw()
 	double path_len=path_to_exit.getLength();
 
 	static int mooover=0, mooover2=0;
-	static double xm=0, ym=0;
+
+	if ( (mooover+=5)>360 ) mooover-=360;
 	
-	if ( (mooover+=2)>360 ) mooover-=360;
-	
-	if ( (mooover2-=3)<0 ) mooover+=360;
+	if ( (mooover2-=4)<0 ) mooover+=360;
 
 	SDL_LockSurface(MYSDLSCREEN);
 	
@@ -519,18 +526,12 @@ void Wormhole::draw()
 		pos+=Vector_2( 
 			( ( cos( (mooover+p*10+i*20)*PI/180 ) * 10 )
 			+
-			( cos( (mooover2+p*2)*PI/180 ) * 15 ) )
+			( cos( (mooover2+p*2)*PI/180 ) ) * 15 )
 			*
-			( ( cos( (rel_pos*360)*PI/180 ) ) ),
-			
+			( ( sin( (rel_pos*360)*PI/180 ) ) ),
 			pos.getAngle()-(PI/2), 
 			P );
 
-		if (p>0 && p<1) {
-			xm=pos.getX();	
-			ym=pos.getY();	
-		}
-			
 		// Color Factor (Fade out in the middle)
 		double cf=(cos( (p/path_len)*2*PI )+1) /3+0.25;
 		double xx, yy, rr, gg, bb;
@@ -543,14 +544,13 @@ void Wormhole::draw()
 		Sprite::putpixel( (int)xx, (int)yy, SDL_MapRGB( MYSDLSCREEN->format, (int)rr, (int)gg, (int)bb ) );
 	}
 
-	Vector_2 p_to_moving_center=Vector_2( xm, ym, K );
-
 	for (int i=0; i<MAXWORM/15; i++ ) {
-		Vector_2 particle=Vector_2( start_particles[i]->getLength(), start_particles[i]->getAngle(), P );
-		Vector_2 part_to_mcenter=p_to_moving_center-particle;
-		particle+=part_to_mcenter.newLength( RANDOM(3,1) );	
-				
-		if (particle.getLength()<=8) {
+		Vector_2 particle=Vector_2(
+			start_particles[i]->getLength()-RANDOM(3,1),
+			start_particles[i]->getAngle()+(5*PI/180),
+			P );
+
+		if (particle.getLength()<=2) {
 			particle=Vector_2(
 				RANDOM( get_Width()*1.5, get_Width()-10), 
 				RANDOM(2*PI,0),
@@ -558,10 +558,10 @@ void Wormhole::draw()
 		}
 
 		delete start_particles[i];
-		start_particles[i]=new Vector_2( particle.getX(), particle.getY(), K );
+		start_particles[i]=new Vector_2( particle.getLength(), particle.getAngle(), P );
 
-		int rr=(int)(205*8/particle.getLength()+50);
-		int gg=(int)(100*8/particle.getLength()+0);
+		int rr=(int)(255-(particle.getLength()*5));
+		int gg=(int)(120-(particle.getLength()*5));
 		int bb=gg;
 
 		int xx=(int)( get_X()+particle.getX() ) + Sprite::x_offset;
@@ -592,6 +592,8 @@ Ufo::Ufo( double x, double y )
 	is_locked(false),
 	shield_strength(MAXENERGY)
 {
+	verbose( "Initializing Ufo" );
+
 	reset();
 	
 	char *u_filename="", *c_filename="";
@@ -919,6 +921,8 @@ Explosion::Explosion( double x, double y )
 	Spaceobject( x, y ),
 	exploding(false)
 {
+	verbose( "Initializing Explosion" );
+
 	explosion_sprite=new Sprite( "gfx/explosionanim.gif", 6 );
 	explosion_sprite->setAlpha(230);
 	explosion_sprite->setRepeatmode(false);
@@ -973,10 +977,13 @@ Shoot::Shoot( double x, double y )
 	last_shootPos( Vector_2(0,0,K) ),
 	pre_calculated_Steps(0)
 {
+	verbose( "Initializing Shoot" );
+
 	width=8;
 	
 	laser_sprite=new Sprite( "gfx/shoot.gif" );
 	laserback_sprite=new Sprite( "gfx/shootback.gif" );
+	laserbackk_sprite=new Sprite( "gfx/shootbackk.gif" );
 	explosion=new Explosion();
 }
 
@@ -984,6 +991,7 @@ Shoot::~Shoot()
 {
 	delete laser_sprite;
 	delete laserback_sprite;
+	delete laserbackk_sprite;
 	delete explosion;
 }
 	
@@ -1089,10 +1097,20 @@ void Shoot::draw()
 			double y_anim=RANDOM(2, -2);
 			int alpha_anim=(int)RANDOM(10, -10);
 			
-			laserback_sprite->setAlpha( 160+alpha_anim );
+			Vector_2 v=last_shootPos-Vector_2( get_X(), get_Y(), K );
+			Vector_2 v_1=v*0.5;
+			Vector_2 v_2=v*0.2;
+			
+			laserbackk_sprite->setAlpha( 120+alpha_anim );
+			laserbackk_sprite->setPos(
+				(int)( get_X()+v_1.getX() ),
+				(int)( get_Y()+v_1.getY() ) );				
+			laserbackk_sprite->draw();
+
+			laserback_sprite->setAlpha( 140+alpha_anim );
 			laserback_sprite->setPos(
-				(int)( ( get_X()+last_shootPos.getX() )/2 + x_anim ),
-				(int)( ( get_Y()+last_shootPos.getY() )/2 + y_anim ) );				
+				(int)( get_X()+v_2.getX() + x_anim ),
+				(int)( get_Y()+v_2.getY() + y_anim ) );				
 			laserback_sprite->draw();
 			
 			laser_sprite->setAlpha( 200+alpha_anim );
@@ -1151,6 +1169,8 @@ Galaxy::Galaxy( int max, int id )
 	objects_in_galaxy(0),
 	ufos_in_galaxy(0)
 {
+	verbose( "Initializing Galaxy" );
+
 	create( max, id );
 
 	shoot=NULL;

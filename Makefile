@@ -8,7 +8,7 @@ INSTALLBIN=/home/pat/prg/bin
 
 CFLAGS = -g -O3 -Wall `sdl-config --cflags`
 CXXFLAGS = $(CFLAGS)
-LIBS = `sdl-config --libs` -lSDL_image
+LIBS = -L. `sdl-config --libs` -lSDL_image
 MAINNAME = ufo
 CC=g++
 

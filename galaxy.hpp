@@ -166,8 +166,8 @@ private:
 		P_JUPITER=0,
 		P_EARTH=1,
 		P_MARS=2,
-		P_GRAY=3,
-		P_GREEN=4 
+		P_VENUS=3,
+		P_SATURN=4 
 	} planet_type;
 
 	Sprite *planet_sprite;
@@ -293,7 +293,8 @@ private:
 	} pre_calculated_Pos[MAXPRECALC];
 	
 	Sprite *laser_sprite,
-		*laserback_sprite;
+		*laserback_sprite,
+		*laserbackk_sprite;
 
 	Explosion *explosion;
 

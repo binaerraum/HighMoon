@@ -38,6 +38,8 @@ extern SDL_Surface* MYSDLSCREEN;
  ******************************************************************************************/
 Font::Font()
 {
+	verbose( "Initializing Font" );
+	
 	if ( (font_image=IMG_Load( "gfx/font.gif" ) ) == NULL ) {
 		std::cout << "Error in Font: " << SDL_GetError() << std::endl;
 		exit(1);
@@ -46,16 +48,17 @@ Font::Font()
 	SDL_SetColorKey(font_image, SDL_SRCCOLORKEY, SDL_MapRGB(font_image->format, 255, 0, 255));
 	font_image=SDL_DisplayFormat(font_image);
 	
-	// 		  									     Z   0                          9
 	int font_sizes[]={
-		0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 2, 5, 2, 0,
+		0, 2, 4, 0, 6, 0, 0, 2, 3, 3, 0, 6, 2, 5, 2, 0,
 		6, 3, 6, 5, 6, 6, 6, 6, 6, 6, 2, 2, 0, 0, 0, 5,
 		6, 6, 6, 6, 6, 6, 5, 6, 6, 2, 5, 6, 5, 8, 6, 6,
-		6, 6, 5, 6, 6, 6, 6, 8, 6, 6, 6, 0, 0, 0, 0, 0 };
+		6, 6, 5, 6, 6, 6, 6, 8, 6, 6, 6, 0, 0, 0, 0, 0,
+		0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	int p=0;
 	
 	// Breiten- und Positionlisten des Fonts erstellen
-	for (int i=0; i<64; i++) {
+	for (int i=0; i<96; i++) {
 		font_pos[i]=p;
 		font_width[i]=font_sizes[i]*4;
 		p+=font_sizes[i]*4;
@@ -87,7 +90,8 @@ void Font::print( int x, int y, std::string txt, int alpha )
 			src.x=font_pos[srcp];
 			src.w=dst.w=font_width[srcp];
 
-			if ( dst.x>SCREENWIDTH || dst.y>SCREENHEIGHT ) break; 
+			if ( dst.x>SCREENWIDTH || dst.y>SCREENHEIGHT ) 
+				break; 
 
 			if ( dst.x+dst.w>=0 && dst.y+dst.h>=0 && src.w>0 )
 				SDL_BlitSurface( font_image, &src, MYSDLSCREEN, &dst );
@@ -129,6 +133,7 @@ Sprite::Sprite( char* filename, int frames ) :
 	frame_delay(ANIMFRAME),
 	frame_rate(ANIMFRAME)
 {
+	verbose( "Initializing Sprite: " + std::string(filename) );
 
 	if ( (sprite_image=IMG_Load( filename )) == NULL ) {
 		std::cout << "Error in Sprite: " << SDL_GetError() << std::endl;
@@ -285,22 +290,80 @@ void Star::draw()
 
 int Star::rx() 
 {
-	return (int)((SCREENWIDTH+100)*(rand()/(RAND_MAX+1.0))+50);
+	return (int)RANDOM( SCREENWIDTH-20, 20);
 }
 
 int Star::ry()
 {
-	return (int)((SCREENHEIGHT+100)*(rand()/(RAND_MAX+1.0))+50); 
+	return (int)RANDOM( SCREENHEIGHT-20, 20);
 }
 
 int Star::color() 
 {
-	return (int)(220*(rand()/(RAND_MAX+1.0))+25); 
+	return (int)RANDOM( 245,25 );
 }
 
 int Star::blink() 
 { 
-	return (int)(2000*(rand()/(RAND_MAX+1.0))+1); 
+	return (int)RANDOM( 2000,1 );
+}
+
+/******************************************************************************************
+ *
+ * Shooting-Star
+ *
+ ******************************************************************************************/
+Shootingstar::Shootingstar()
+:
+	x(rx()),
+	y(ry()),
+	s(speed()),
+	w(wait())
+{}
+
+void Shootingstar::draw()
+{
+	if ( w--==0 ) {
+		w=wait();
+		x=rx();
+		y=ry();
+		s=speed();
+	}
+
+	double as=(s<0)? -s : s;
+	
+	if (w<40) {
+
+		for (int i=0; i<10; i++) {
+			int c=(int)(((double)w)/40*(i*25));
+			if (i==9) c+=10;
+			int x=(int)(this->x+s*i);
+			int y=(int)(this->y+as*i);
+			Sprite::putpixel( x, y, SDL_MapRGB( MYSDLSCREEN->format, c, c, c+20 ));
+		}
+		x+=s*4;
+		y+=as*4;
+	}
+}
+
+double Shootingstar::rx() 
+{
+	return (int)RANDOM( SCREENWIDTH-200, 200);
+}
+
+double Shootingstar::ry()
+{
+	return (int)RANDOM( SCREENHEIGHT-200, 100);
+}
+
+double Shootingstar::speed()
+{
+	return ( (int)RANDOM(2,0)==1 ) ? 1 : -1;
+}
+
+int Shootingstar::wait() 
+{ 
+	return (int)RANDOM(2000,1000);
 }
 
 /******************************************************************************************
@@ -315,11 +378,31 @@ Goldrain::Goldrain()
 	sp(speed()), 
 	xoffset(0),
 	yoffset(0),
-	b(blink()), 
-	cr(color()),
-	cg(color()), 
-	cb(color())
-{}
+	b(blink()),
+	cr(0),
+	cg(0),
+	cb(0)
+{
+	switch ((int)RANDOM(4,0)) {
+
+		case 0:
+			cr=color();
+			break;
+
+		case 1:
+			cg=color();
+			break;
+
+		case 2:
+			cg=cr=color();
+			break;
+
+		default:
+			cb=color();
+	}
+
+
+}
 	
 void Goldrain::setOffset(int x, int y) 
 {
@@ -339,33 +422,45 @@ void Goldrain::draw()
 	if ( b--==0 )
 		b=blink();
 	else if (b>1 && y>=0) {
-		Sprite::putpixel( (int)(x+xoffset), (int)(y+yoffset),
-			SDL_MapRGB( MYSDLSCREEN->format, (int)(cr*y/150)+40, (int)(cg*y/150)+40, (int)(cb*y/150)+40 ));
+		int r=(int)(cr*y/110)+40;
+		int g=(int)(cg*y/110)+40;
+		int b=(int)(cb*y/110)+40;
+		
+		Sprite::putpixel( (int)(x+xoffset), (int)(y+yoffset), SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
+		
+		if (r>150 || g>150 || b>130)
+			Sprite::putpixel( (int)(x+xoffset+1), (int)(y+yoffset), SDL_MapRGB( MYSDLSCREEN->format, r/2, g/2, b/2 ) );
+
+		if (r>170 || g>170 || b>150)
+			Sprite::putpixel( (int)(x+xoffset), (int)(y+yoffset+1), SDL_MapRGB( MYSDLSCREEN->format, r/2, g/2, b/2 ) );
+
+		if (r>200 || g>200 || b>180)
+			Sprite::putpixel( (int)(x+xoffset+1), (int)(y+yoffset+1), SDL_MapRGB( MYSDLSCREEN->format, r/2, g/2, b/2 ) );		
 	}	
 }
 
-int Goldrain::rx() 
+double Goldrain::rx() 
 {
-	return (int)(80*(rand()/(RAND_MAX+1.0))-40); 
+	return RANDOM( 40,-40 );
 }
 
-int Goldrain::ry() 
+double Goldrain::ry() 
 {
-	return (int)(100*(rand()/(RAND_MAX+1.0))); 
+	return RANDOM( 100,0 );
 }
 
 double Goldrain::speed()
 {
-	return (1*(rand()/(RAND_MAX+1.0))+1); 
+	return RANDOM( 2,1 );
 }
 
 int Goldrain::color() 
 {
-	return (int)(255*(rand()/(RAND_MAX+1.0))); 
+	return (int)RANDOM( 255, 100 );
 }
 
 int Goldrain::blink()
 {
-	return (int)(10*(rand()/(RAND_MAX+1.0)));
+	return (int)RANDOM( 10,0 );
 }
 

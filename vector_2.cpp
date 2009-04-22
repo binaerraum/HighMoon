@@ -53,15 +53,30 @@ Vector_2::Vector_2( double a, double b, Vectortype typ )
 	}
 }
 
-bool Vector_2::isInfinite() { return infinite; }
+bool Vector_2::isInfinite()
+{
+	return infinite; 
+}
 
-double Vector_2::getX() { return x; }
+double Vector_2::getX() 
+{ 
+	return x; 
+}
 
-double Vector_2::getY() { return y; }
+double Vector_2::getY() 
+{ 
+	return y; 
+}
 
-double Vector_2::getLength() { return length; }
+double Vector_2::getLength() 
+{ 
+	return length; 
+}
 
-double Vector_2::getAngle() { return angle; }
+double Vector_2::getAngle() 
+{ 
+	return angle; 
+}
 
 bool Vector_2::operator==( Vector_2 v )
 {
@@ -107,6 +122,38 @@ Vector_2 Vector_2::operator-( Vector_2 v )
 	return r-=v;
 }
 
+Vector_2& Vector_2::operator*=( double f )
+{
+	length*=f;
+	x*=f;
+	y*=f;
+	
+	return *this;
+}
+
+Vector_2 Vector_2::operator*( double f )
+{
+	Vector_2 r=*this;
+	
+	return r*=f;
+}
+
+Vector_2& Vector_2::operator/=( double q )
+{
+	length/=q;
+	x/=q;
+	y/=q;
+	
+	return *this;
+}
+
+Vector_2 Vector_2::operator/( double q )
+{
+	Vector_2 r=*this;
+
+	return r/=q;
+}
+
 double Vector_2::distance( Vector_2 v )
 {
 	double dx = x-v.getX();
@@ -134,8 +181,11 @@ double Vector_2::angleDifference( double angle1, double angle2 )
 {
 	double d=fabs(angle1-angle2);
 
-	if ( d>2*PI ) d=d-2*PI;
-	if ( d>PI ) d=2*PI-d;
+	if ( d>2*PI ) 
+		d=d-2*PI;
+
+	if ( d>PI )
+		d=2*PI-d;
 
 	return d;
 }
@@ -163,7 +213,8 @@ Vector_2 Vector_2::rayCrossPoint( Vector_2 v1, double angle1, Vector_2 v2, doubl
 
 std::ostream& operator<<( std::ostream& s, Vector_2 v )
 {
-	if (v.isInfinite()) return s << "INFINITE";
+	if (v.isInfinite())
+		return s << "INFINITE";
 	
 	return s << "x:" << v.getX() << " y:" << v.getY() << " l:" << v.getLength() << " w:" << ( v.getAngle()*180.0/PI );
 }
