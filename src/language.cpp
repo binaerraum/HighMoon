@@ -1,6 +1,6 @@
 /******************************************************************************************
  *
- * HighNoon - Duell im All Version 1.0
+ * HighMoon - Duell im All Version 1.0
  * Copyright (c) 2005 Patrick Gerdsmeier <patrick@gerdsmeier.net>
  *
  * "language.cpp"
@@ -28,7 +28,7 @@
 #include "language.hpp"
 #include "constants.hpp"
 
-const int MAXLANGUAGES = 7;
+const int MAXLANGUAGES = 8;
 
 Language::Language()
 :
@@ -68,6 +68,8 @@ void Language::set( char *language )
 	else if ( !strncmp( language, 	"es", 2 ) ) set( LANG_SPANISH );
 
 	else if ( !strncmp( language, 	"ru", 2 ) ) set( LANG_RUSSIAN );
+	
+	else if ( !strncmp( language, 	"it", 2 ) ) set( LANG_ITALIAN );
 }
 	
 char* Language::getWindowtext() const
@@ -79,7 +81,8 @@ char* Language::getWindowtext() const
 		"HighMoon - Przeciwnicy w Kosmosie od Patrick Gerdsmeier",
 		"HighMoon - Duelo uo Universo de Patrick Gerdsmeier",
 		"HighMoon - Duelo en el Espacio de Patrick Gerdsmeier",
-		"HighMoon - Dy3^b B Kocmoce om Patrick Gerdsmeier"
+		"HighMoon - Dy3^b B Kocmoce om Patrick Gerdsmeier",
+		"HighMoon - Sfida nello Spazio di Patrick Gerdsmeier"
 	};
 
 	return r[language];
@@ -176,6 +179,18 @@ std::string Language::getTitletext( int id ) const
 			"lnzEH}nA Y {pl",
 			"",
 			"F1 pOMOvw",
+			"F2 ITALIANO"
+		},
+                {
+			"HIGHMOON",
+			"",
+			"SFIDA NELLO SPAZIO V"+VERSION,
+			"FEBBRAIO 2005",
+			"DI PATRICK GERDSMEIER,",
+			"PATRICK@GERDSMEIER.NET",
+			"RILASCIATO CON LICENZA GPL",
+			"",
+			"F1 AIUTO",
 			"F2 ENGLISH"
 		}
 	
@@ -261,8 +276,18 @@ std::string Language::getScrollertext() const
 		"SPACE HAYABlEHOm OCTABnTw YTOkwI YCTAHOBnTw CnlY BwICTPElA - "
 		"F MEHrET PA}MEP OKHA. "
 		"C MEHrET CnlY KOMpoTEPA 1..5.   "
-		"HIGHMOON yY}lw B KOCMOCE. HApsCAHO pATPnKOM nkAHOknsA {EPyCMAEPA.     "
+		"HIGHMOON yY}lw B KOCMOCE. HApsCAHO pATPnKOM nkAHOknsA {EPyCMAEPA.     ",
 		
+		"USA I TASTI 1, 2 E 3 PER LE MODALITA' DI GIOCO - "
+		"TAB PER CAMBIARE GALASSIA - "
+		"CURSORE DESTRO E SINISTRO PER VARIARE L'ANGOLO DI TIRO - "
+		"CURSORE SU E GIU' PER MUOVERE LA NAVETTA - "
+		"TIENI PREMUTA LA BARRA SPAZIO PER INCREMENTARE LA POTENZA DELLO SPARO - RILASCIA PER SPARARE - "
+		"USA INVIO PER ACQUISTARE ARMI O RINFORZARE LO SCUDO - "
+		"F ALTERNA LA MODALITA' FINESTRA O SCHERMO INTERO. "
+		"C VARIA L'ABILITA' DEL COMPUTER DA 1 A 5.   "
+		"HIGHMOON : SFIDA NELLO SPAZIO E' STATO CREATO NEL 2005 DA PATRICK GERDSMEIER ED E' RILASCIATO CON LICENZA GPL.   "
+		"BUON DIVERTIMENTO!   DEDICATO A ULI     "
 	};
 
 	return r[language];
@@ -277,7 +302,8 @@ std::string Language::getPlayertext( int id ) const
 		"GRACZ",
 		"JOGADOR",
 		"JUGADOR",
-		"U{POK"
+		"U{POK",
+		"GIOCATORE"
 	};	
 
 	std::ostringstream r;
@@ -296,7 +322,8 @@ std::string Language::getComputertext( int strength ) const
 		{ "NOWICJUSZ", "REKRUT", "fOcNIERZ", "OFICER", "GENERAc" },
 		{ "INICIANTE", "REKRUTANTE", "SOLDADO", "OFICIAL", "GENERAL" },
 		{ "NOVICIO", "RECLUTA", "SOLDADO", "OFICIAL", "GENERAL" },
-		{ "HOBnsOK", "PEKPYT", "COlyAT", "OqnzEP", "{ENEPAl" }
+		{ "HOBnsOK", "PEKPYT", "COlyAT", "OqnzEP", "{ENEPAl" },
+		{ "DILETTANTE", "RECLUTA", "SOLDATO", "UFFICIALE", "GENERALE" }
 	};
 
 	std::ostringstream r;
@@ -318,7 +345,8 @@ std::string Language::getShieldtext( int energy ) const
 		"TARCZA",
 		"ARMADURA",
 		"PROTECION",
-		"vnT"
+		"vnT",
+		"SCUDO"
 	};
 
 	std::ostringstream r;
@@ -359,8 +387,12 @@ std::string Language::getWinnertext( int winner ) const
 		{
 			"KOMpoTEP BwInTRAl!"
 			"nTPOK", "BwInTRAl!"
-		}
+		},
 
+		{
+			"IL COMPUTER HA VINTO!",
+			"GIOCATORE", "HAI VINTO!"
+		}
 	};
 
 	std::ostringstream r;
@@ -382,7 +414,8 @@ std::string Language::getWarptext( int seed, int planets ) const
 		"GALAKTYKI",
 		"NUMERO",
 		"NUMERO",
-		"{AlAKTnKY"
+		"{AlAKTnKY",
+		"NUMERO"
 	};
 
 	std::ostringstream r;
@@ -401,7 +434,8 @@ std::string Language::getWarptext() const
 		"TELEPORTACJA DO",
 		"WARPE PELA GALhXIA",
 		"SALTAR A LA GALAXIA",
-		"TElEpORTAznr B"
+		"TElEpORTAznr B",
+		"VERSO LA GALASSIA"
 	};
 
 	return r[language];

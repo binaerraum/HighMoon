@@ -2,30 +2,32 @@
 # Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
 # __Something like /usr/local/share/highmoon. All Files (Data and Binary) will be copied there:__ 
-INSTALLPATH=/home/pat/HighMoon
+INSTALLPATH=/home/pat/Programme/Spiele/HighMoon
 
 # __Set this to a bin-Path. The Installer will create a small Execution-Script in that Path:__
-INSTALLBIN=/home/pat/prg/bin
+INSTALLBIN=/home/pat/Programme/Spiele/bin
 
 CACHE	 = #ccache	# use http://ccache.samba.org to speedup compiling
 CXX      = $(CACHE) g++ 
 CXXFLAGS = -g -O3 -Wall `sdl-config --cflags`
-LDFLAGS  =
+LDFLAGS  = #-static -s
 LIBS     = -L. `sdl-config --libs` -lSDL_image
+#LIBS     = -L. `sdl-config --static-libs` -lSDL_image -lpng -ljpeg -lz -lm
 SRCDIR   = src
-MAINNAME = ufo
+BIN      = ufo
 
 OBJS = 	$(SRCDIR)/main.o $(SRCDIR)/vector_2.o $(SRCDIR)/language.o $(SRCDIR)/sound.o $(SRCDIR)/graphics.o $(SRCDIR)/object.o $(SRCDIR)/galaxy.o $(SRCDIR)/shoot.o
 
-all:	$(MAINNAME)
+all:	$(BIN)
 
-ufo:	$(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(MAINNAME) $(OBJS) $(LIBS)
+$(BIN):	$(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BIN) $(OBJS) $(LIBS)
 
 clean:        
-	rm -f $(SRCDIR)/*.o
-	rm -f $(SRCDIR)/*~
-	rm -f *~
+	@echo "Removing Backup- and Object-Files."
+	@rm -f $(SRCDIR)/*.o
+	@rm -f $(SRCDIR)/*~
+	@rm -f *~
 
 new: 	clean all
 
@@ -36,13 +38,13 @@ install:
 	@echo "Creating Directories and Installing Files."
 	@mkdir -p $(INSTALLBIN)
 	@mkdir --mode=755 -p $(INSTALLPATH)/gfx $(INSTALLPATH)/snd
-	@install --strip --mode=755 ufo $(INSTALLPATH)
+	@install --strip --mode=755 $(BIN) $(INSTALLPATH)
 	@install --mode=644 gfx/* $(INSTALLPATH)/gfx
 	@install --mode=644 snd/* $(INSTALLPATH)/snd
 	@echo "Creating $(INSTALLBIN)/highmoon to run HighMoon."
 	@echo >$(INSTALLBIN)/highmoon '#!/bin/sh'
 	@echo >>$(INSTALLBIN)/highmoon 'cd $(INSTALLPATH)'
-	@echo >>$(INSTALLBIN)/highmoon './ufo'
+	@echo >>$(INSTALLBIN)/highmoon './$(BIN) $$1'
 	@chmod 755 $(INSTALLBIN)/highmoon
 
 uninstall:

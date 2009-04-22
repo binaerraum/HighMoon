@@ -708,7 +708,7 @@ void Ufo::buy_Bonus()
 		switch (bonus) {
 		
 			case 1: 
-				shield_strength += 10;
+				shield_strength += 5;
 				bonus = 0;
 				break;
 
@@ -727,7 +727,7 @@ void Ufo::buy_Bonus()
 				break;
 				
 			case 4: 
-				shield_strength +=50;
+				shield_strength +=25;
 				bonus = 0;
 				break;
 		}
