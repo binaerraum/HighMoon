@@ -1,7 +1,7 @@
 /******************************************************************************************
  *
  * HighMoon - Duell im All Version 1.0
- * Copyright (c) 2005 Patrick Gerdsmeier <patrick@gerdsmeier.net>
+ * Copyright (c) 2005, 2006 Patrick Gerdsmeier <patrick@gerdsmeier.net>
  *
  * "language.cpp"
  * 
@@ -28,7 +28,7 @@
 #include "language.hpp"
 #include "constants.hpp"
 
-const int MAXLANGUAGES = 8;
+const int MAXLANGUAGES = 9;
 
 Language::Language()
 :
@@ -70,6 +70,8 @@ void Language::set( char *language )
 	else if ( !strncmp( language, 	"ru", 2 ) ) set( LANG_RUSSIAN );
 	
 	else if ( !strncmp( language, 	"it", 2 ) ) set( LANG_ITALIAN );
+
+	else if ( !strncmp( language, 	"nl", 2 ) ) set( LANG_NETHERLAND );
 }
 	
 char* Language::getWindowtext() const
@@ -82,7 +84,8 @@ char* Language::getWindowtext() const
 		"HighMoon - Duelo uo Universo de Patrick Gerdsmeier",
 		"HighMoon - Duelo en el Espacio de Patrick Gerdsmeier",
 		"HighMoon - Dy3^b B Kocmoce om Patrick Gerdsmeier",
-		"HighMoon - Sfida nello Spazio di Patrick Gerdsmeier"
+		"HighMoon - Sfida nello Spazio di Patrick Gerdsmeier",
+		"Highmoon - Duel in de Ruimte door Patrick Gerdsmeier"
 	};
 
 	return r[language];
@@ -95,7 +98,7 @@ std::string Language::getTitletext( int id ) const
 			"HIGHMOON",
 			"",
 			"DUEL IN SPACE V"+VERSION,
-			"FEBRUARY 2005",
+			"2005, 2006",
 			"BY PATRICK GERDSMEIER,",
 			"PATRICK@GERDSMEIER.NET",
 			"LICENSED UNDER THE GPL",
@@ -108,7 +111,7 @@ std::string Language::getTitletext( int id ) const
 			"HIGHMOON",
 			"",
 			"DUELL IM ALL V"+VERSION,
-			"FEBRUAR 2005",
+			"2005, 2006",
 			"VON PATRICK GERDSMEIER,",
 			"PATRICK@GERDSMEIER.NET",
 			"LIZENSIERT UNTER DER GPL",
@@ -121,7 +124,7 @@ std::string Language::getTitletext( int id ) const
 			"HIGHMOON",
 			"",
 			"DUEL DANS L'UNIVERS V"+VERSION,
-			"FiVRIER 2005",
+			"2005, 2006",
 			"DE PATRICK GERDSMEIER,",
 			"PATRICK@GERDSMEIER.NET",
 			"LICENCE SOUS LE GPL",
@@ -134,7 +137,7 @@ std::string Language::getTitletext( int id ) const
 			"HIGHMOON",
 			"",
 			"PRZECIWNICY W KOSMOSIE V"+VERSION,
-			"LUTY 2005",
+			"2005, 2006",
 			"OD PATRICK GERDSMEIER,",
 			"PATRICK@GERDSMEIER.NET",
 			"POD LICENCJa GPL",
@@ -147,7 +150,7 @@ std::string Language::getTitletext( int id ) const
 			"HIGHMOON",
 			"",
 			"DUELO UO UNIVERSO V"+VERSION,
-			"FEVEREIRO 2005",
+			"2005, 2006",
 			"DE PATRICK GERDSMEIER,",
 			"PATRICK@GERDSMEIER.NET",
 			"LICENgA A BAIXO DE GPL",
@@ -160,7 +163,7 @@ std::string Language::getTitletext( int id ) const
 			"HIGHMOON",
 			"",
 			"DUELO EN EL ESPACIO V"+VERSION,
-			"FEBRERO 2005",
+			"2005, 2006",
 			"DE PATRICK GERDSMEIER,",
 			"PATRICK@GERDSMEIER.NET",
 			"CONTRATO DE LICENCIA BAJO GPR",
@@ -173,7 +176,7 @@ std::string Language::getTitletext( int id ) const
 			"HIGHMOON",
 			"",
 			"DY}lw B KOCMOCE V"+VERSION,
-			"qEkPAlw 2005",
+			"2005, 2006",
 			"OM pATPnKA nkAHOknsA {EPyCMAEPA,",
 			"PATRICK@GERDSMEIER.NET",
 			"lnzEH}nA Y {pl",
@@ -181,19 +184,32 @@ std::string Language::getTitletext( int id ) const
 			"F1 pOMOvw",
 			"F2 ITALIANO"
 		},
-                {
+        
+        {
 			"HIGHMOON",
 			"",
 			"SFIDA NELLO SPAZIO V"+VERSION,
-			"FEBBRAIO 2005",
+			"2005, 2006",
 			"DI PATRICK GERDSMEIER,",
 			"PATRICK@GERDSMEIER.NET",
 			"RILASCIATO CON LICENZA GPL",
 			"",
 			"F1 AIUTO",
+			"F2 NEDERLANDS"
+		},
+		
+		{
+			"HIGHMOON",
+			"",
+			"DUEL IN DE RUIMTE V"+VERSION,
+			"2005, 2006",
+			"DOOR PATRICK GERDSMEIER,",
+			"PATRICK@GERDSMEIER.NET",
+			"DE LICENTIE IS GPL",
+			"",
+			"F1 VOOR HELP",
 			"F2 ENGLISH"
 		}
-	
 	};
 	
 	return r[language][id];
@@ -287,7 +303,21 @@ std::string Language::getScrollertext() const
 		"F ALTERNA LA MODALITA' FINESTRA O SCHERMO INTERO. "
 		"C VARIA L'ABILITA' DEL COMPUTER DA 1 A 5.   "
 		"HIGHMOON : SFIDA NELLO SPAZIO E' STATO CREATO NEL 2005 DA PATRICK GERDSMEIER ED E' RILASCIATO CON LICENZA GPL.   "
-		"BUON DIVERTIMENTO!   DEDICATO A ULI     "
+		"BUON DIVERTIMENTO!   DEDICATO A ULI     ",
+		
+		"DE TOETSEN 1, 2 EN 3 VOOR SPEL MODE KEUZE - "
+		"TAB VERANDERD HET ZONNESTELSEL - "
+		"CURSOR LINKS EN RECHTS GEBRUIKEN OM TE RICHTEN MET SCHIETEN - "
+		"CURSOR OMHOOG EN OMLAAG OM HET RUIMTESCHIP TE BEWEGEN - "
+		"HOUD SPATIEBALK INGEDRUKT OM SCHIETKRACHT TE VERHOGEN - "
+		"EN LAAT SPATIEBALK LOS OM TE SCHIETEN - "
+		"DRUK ENTER OM EEN KRACHTSCHILD OF NIEUWE WAPENS TE KOPEN - "
+		"F WISSELD VAN WINDOW NAAR FULLSCREEN MODUS. "
+		"C WISSELD COMPUTERKRACHT 1..5.   "
+		"HIGHMOON DUEL IN DE RUIMTE IS GESCHREVEN DOOR PATRICK GERDSMEIER IN 2005"
+		"DE LICENTIE IS GPL.   "
+		"VEEL PLEZIER!   "
+		"SPECIAAL GEMAAKT VOOR ULI     "	
 	};
 
 	return r[language];
@@ -303,7 +333,8 @@ std::string Language::getPlayertext( int id ) const
 		"JOGADOR",
 		"JUGADOR",
 		"U{POK",
-		"GIOCATORE"
+		"GIOCATORE",
+		"SPELER"
 	};	
 
 	std::ostringstream r;
@@ -323,7 +354,8 @@ std::string Language::getComputertext( int strength ) const
 		{ "INICIANTE", "REKRUTANTE", "SOLDADO", "OFICIAL", "GENERAL" },
 		{ "NOVICIO", "RECLUTA", "SOLDADO", "OFICIAL", "GENERAL" },
 		{ "HOBnsOK", "PEKPYT", "COlyAT", "OqnzEP", "{ENEPAl" },
-		{ "DILETTANTE", "RECLUTA", "SOLDATO", "UFFICIALE", "GENERALE" }
+		{ "DILETTANTE", "RECLUTA", "SOLDATO", "UFFICIALE", "GENERALE" },
+		{ "BEGINNER", "RECRUIT", "SOLDAAT", "OFFICIER", "GENERAAL" }
 	};
 
 	std::ostringstream r;
@@ -346,7 +378,8 @@ std::string Language::getShieldtext( int energy ) const
 		"ARMADURA",
 		"PROTECION",
 		"vnT",
-		"SCUDO"
+		"SCUDO",
+		"SCHILD"
 	};
 
 	std::ostringstream r;
@@ -392,6 +425,11 @@ std::string Language::getWinnertext( int winner ) const
 		{
 			"IL COMPUTER HA VINTO!",
 			"GIOCATORE", "HAI VINTO!"
+		},
+		
+		{
+			"DE COMPUTER HEEFT GEWONNEN!",
+			"SPELER", "HEEFT GEWONNEN!"	
 		}
 	};
 
@@ -415,7 +453,8 @@ std::string Language::getWarptext( int seed, int planets ) const
 		"NUMERO",
 		"NUMERO",
 		"{AlAKTnKY",
-		"NUMERO"
+		"NUMERO",
+		"NUMMER"
 	};
 
 	std::ostringstream r;
@@ -435,7 +474,8 @@ std::string Language::getWarptext() const
 		"WARPE PELA GALhXIA",
 		"SALTAR A LA GALAXIA",
 		"TElEpORTAznr B",
-		"VERSO LA GALASSIA"
+		"VERSO LA GALASSIA",
+		"ZONNESTELSEL"		
 	};
 
 	return r[language];

@@ -1,7 +1,7 @@
 /******************************************************************************************
  *
  * HighMoon - Duell im All
- * Copyright (c) 2005 Patrick Gerdsmeier <patrick@gerdsmeier.net>
+ * Copyright (c) 2005, 2006 Patrick Gerdsmeier <patrick@gerdsmeier.net>
  *
  * "language.hpp"
  * 
@@ -43,7 +43,8 @@ enum Languagetype {
 	LANG_PORTUGUESE=4,
 	LANG_SPANISH=5,
 	LANG_RUSSIAN=6,
-	LANG_ITALIAN=7
+	LANG_ITALIAN=7,
+	LANG_NETHERLAND=8
 };
 
 class Language

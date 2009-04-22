@@ -1,7 +1,7 @@
 /*****************************************************************************************
  *
  * vector_2
- * Patrick Gerdsmeier 2004, <patrick@gerdsmeier.net>
+ * Patrick Gerdsmeier 2004, 2005, 2006 <patrick@gerdsmeier.net>
  *
  *
  *

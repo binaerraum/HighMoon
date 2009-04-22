@@ -1,7 +1,7 @@
 /******************************************************************************************
  *
  * HighNoon - Duel in Space
- * Copyright (c) 2005 Patrick Gerdsmeier <patrick@gerdsmeier.net>
+ * Copyright (c) 2005, 2006 Patrick Gerdsmeier <patrick@gerdsmeier.net>
  *
  * "constants.cpp"
  * 
@@ -37,8 +37,8 @@
 //#define __THREADS__		// Tested Threads... didn't work faster =( 
 #define __ENVIRONMENT__		// Has OS Environment?
 
-const std::string VERSION 	= "1.2.3";
-const std::string COPYRIGHT 	= "Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>";
+const std::string VERSION 	= "1.2.4";
+const std::string COPYRIGHT 	= "Copyright (c) 2005, 2006 Patrick Gerdsmeier <patrick@gerdsmeier.net>";
 const std::string WEBSITE 	= "http://highmoon.gerdsmeier.net";
 
 const double PI 		=  3.141592;

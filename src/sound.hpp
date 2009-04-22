@@ -1,7 +1,7 @@
 /******************************************************************************************
  *
  * HighNoon - Duell im All Version 1.0
- * Copyright (c) 2005 Patrick Gerdsmeier <patrick@gerdsmeier.net>
+ * Copyright (c) 2005, 2006 Patrick Gerdsmeier <patrick@gerdsmeier.net>
  *
  * "sound.hpp"
  * 

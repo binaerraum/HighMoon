@@ -1,5 +1,5 @@
 # HighMoon - Duel in Space
-# Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
+# Copyright (c) 2005, 2006 Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
 # __Something like /usr/local/share/highmoon. All Files (Data and Binary) will be copied there:__ 
 INSTALLPATH=/home/pat/Programme/Spiele/HighMoon
