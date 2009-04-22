@@ -35,7 +35,7 @@ extern Soundset sound;
 extern int __SHOOTS;
 #endif
 
-Planet::Planet( int x, int y, int type ) :
+Planet::Planet( int x, int y, Planettype type ) :
 	x(x),
 	y(y),
 	weight(getWeightByType(type)),
@@ -46,13 +46,15 @@ Planet::Planet( int x, int y, int type ) :
 { 
 	for (int i=0; i<MAXHOLE; i++) {
 		double l;
-		if (type==4) l=60*(rand()/(RAND_MAX+1.0))+5;
+		
+		if (type==BLACKHOLE) l=60*(rand()/(RAND_MAX+1.0))+5;
 		else l=25*(rand()/(RAND_MAX+1.0))+5;
+		
 		double a=2*PI*(rand()/(RAND_MAX+1.0));
 		holes[i]=new Vector2d( l, a, P );
 	}
 	
-	if (type==5) {
+	if (type==WORMHOLE) {
 		worm_x=((SCREENWIDTH-350)*(rand()/(RAND_MAX+1.0))+175);
 		worm_y=(SCREENHEIGHT*(rand()/(RAND_MAX+1.0)));
 	}
@@ -69,14 +71,15 @@ int Planet::getY() { return (int)y; }
 
 int Planet::getWeight() { return weight; }
 
-int Planet::getWidth() { 
-	if (type==4) return -1;
-	if (type==5) return 25;
+int Planet::getWidth()
+{ 
+	if (type==BLACKHOLE) return -1;
+	if (type==WORMHOLE) return 25;
 
 	return planet.getWidth()-2;
 }
 
-bool Planet::isWormhole() { return (type==5) ? true : false; }
+bool Planet::isWormhole() { return (type==WORMHOLE) ? true : false; }
 
 int Planet::getWormX() { return (int)worm_x; }
 
@@ -88,10 +91,9 @@ void Planet::setY( int y ) { this->y=(double)y; }
 
 bool Planet::collision( int x, int y, int w, bool active, bool init )
 {
-	if (!init && type==4) return false;
+	if (!init && type==BLACKHOLE) return false;
 	
-	bool r=false;
-	
+	bool r=false;	
 	int x2=getX();
 	int y2=getY();
 	int w2=getWidth();
@@ -113,7 +115,7 @@ bool Planet::collision( int x, int y, int w, bool active, bool init )
 
 void Planet::draw() 
 {
-	if (type<4) {
+	if (type<BLACKHOLE) {
 		animateHit();
 		planet.setPos((int)x, (int)y);
 		planet.draw();
@@ -123,47 +125,47 @@ void Planet::draw()
 	
 }	
 	
-int Planet::getWeightByType( int type )
+int Planet::getWeightByType( Planettype type )
 {
 	int w;
 
 	switch (type) {
-		case 0:
-			w=350;
+		case JUPITER:
+			w=WEIGHT_JUPITER;
 			break;
-		case 1:
-			w=300;
+		case EARTH:
+			w=WEIGHT_EARTH;
 			break;
-		case 2:
-			w=225;
+		case MARS:
+			w=WEIGHT_MARS;
 			break;
-		case 3:
-			w=100;
+		case MOON:
+			w=WEIGHT_MOON;
 			break;
-		case 5: w=10;
+		case BLACKHOLE: w=WEIGHT_BLACKHOLE;
 			break;
 		default:
-			w=250;
+			w=WEIGHT_WORMHOLE;
 	}
 
 	return w;
 }
 
-Sprite Planet::getImageByType( int type )
+Sprite Planet::getImageByType( Planettype type )
 {
 	char* filename;
 	
 	switch (type) {
-		case 0:
+		case JUPITER:
 			filename="gfx/jupiter.bmp";
 			break;
-		case 1:
+		case EARTH:
 			filename="gfx/earth.bmp";
 			break;
-		case 2:
+		case MARS:
 			filename="gfx/mars.bmp";
 			break;	
-		case 3:
+		case MOON:
 			filename="gfx/moon.bmp";
 			break;
 		default:
@@ -184,12 +186,13 @@ void Planet::drawBlackHole()
 	holeanim+=2; if (holeanim>360) holeanim-=360;
 	double m=1;
 	SDL_LockSurface(MYSDLSCREEN);
-	for (int i=0; i<((type==5)?MAXWORM:MAXHOLE); i++) {
+	
+	for (int i=0; i<( (type==WORMHOLE)?MAXWORM:MAXHOLE ); i++) {
 		double l=holes[i]->getLength();
 		double a=holes[i]->getAngle();
 		l-=m/5*3; 
 		
-		if (type==4) { 
+		if (type==BLACKHOLE) { 
 			a-=PI/180*4; 
 			if (a<0) a+=2*PI;
 			if (l<5) l+=65;
@@ -198,17 +201,22 @@ void Planet::drawBlackHole()
 			if (a>2*PI) a-=2*PI;		
 			if (l<5) l+=35;
 		}
+
 		delete holes[i];
 		holes[i]=new Vector2d( l, a, P );
+
 		double f=cos(holeanim*PI/180)/6+.75;
 		int xx=(int)( x+(holes[i]->getX())*f)+Sprite::x_offset;
 		int yy=(int)( y+(holes[i]->getY())*f)+Sprite::y_offset;
+
 		if (m++>3) m-=3;
-		int r=(type==5) ? (int)(l*3+30) : (int)(l*2+50);
-		int g=(type==5) ? (int)(l*2+50) : (int)(m*l/2+30);
-		int b=(type==5) ? (int)(m*l/2) : (int)(l*2+50);
+
+		int r=(type==WORMHOLE) ? (int)(l*3+30) : (int)(l*2+50);
+		int g=(type==WORMHOLE) ? (int)(l*2+50) : (int)(m*l/2+30);
+		int b=(type==WORMHOLE) ? (int)(m*l/2) : (int)(l*2+50);
 		Sprite::putpixel( xx, yy, SDL_MapRGB( MYSDLSCREEN->format, r, g, b ) );
 	}
+	
 	SDL_UnlockSurface(MYSDLSCREEN);
 }
 
@@ -243,12 +251,14 @@ void Galaxy::initGalaxy( int planets )
 {
 	if (!imploding) {
 		
-		for (int i=0; i<planets; i++) delete galaxy[i];
+		srand(time(NULL));
+
+		// Clear current planets:
+		for (int i=0; i<this->planets; i++) delete galaxy[i];
 
 		if (planets>MAXPLANETS) planets=MAXPLANETS;
 		
 		int myholes=0;
-		srand(time(NULL));
 		this->planets=planets;
 
 		for (int i=0; i<planets; i++) {
@@ -259,7 +269,7 @@ void Galaxy::initGalaxy( int planets )
 				x=(int)((SCREENWIDTH-350)*(rand()/(RAND_MAX+1.0))+175);
 				y=(int)(SCREENHEIGHT*(rand()/(RAND_MAX+1.0)));
 				p=(int)((PLANETTYPES)*(rand()/(RAND_MAX+1.0)));
-				w=Planet::getWeightByType(p);
+				w=Planet::getWeightByType((Planettype)p);
 									
 				if (p>=4) myholes++;
 				pos_notfound=false;
@@ -275,16 +285,14 @@ void Galaxy::initGalaxy( int planets )
 				
 			} while (pos_notfound);
 			
-			galaxy[i]=new Planet(x, y, p);
+			galaxy[i]=new Planet(x, y, (Planettype)p);
 			wanted_pos[i].y=y;
 		}
 		
-		for (int i=0; i<planets; i++) {
-			galaxy[i]->setY(-600);
-		}
+		for (int i=0; i<planets; i++) galaxy[i]->setY(-600);
+
+		sound.play(WARPGALAXY);
 		imploding=true;
-		
-		sound.play(3);
 	}
 }
 
@@ -313,6 +321,7 @@ bool Galaxy::bigBang()
 	bool moving=false;
 	
 	if (imploding) {
+		
 		for (int i=0; i<planets; i++) {
 			int wp=wanted_pos[i].y;
 			int pp=galaxy[i]->getY();
@@ -326,6 +335,7 @@ bool Galaxy::bigBang()
 					pp=wp;
 				}
 			}
+
 			galaxy[i]->setY(pp);
 		}
 	}
@@ -360,10 +370,7 @@ void Shoot::setPos( double x, double y )
 	this->y=y;
 }
 
-void Shoot::kill()
-{
-	active=false;
-}
+void Shoot::kill() { active=false; }
 
 void Shoot::activate( Vector2d p, Vector2d v )
 {
@@ -374,7 +381,7 @@ void Shoot::activate( Vector2d p, Vector2d v )
 	lasty=y;
 	active=true;
 	shoot_time=MAXSHOOTRUN;
-	sound.play(1);
+	sound.play(SHOOT);
 	
 	#ifdef __DEBUG__
 	__SHOOTS++;
@@ -392,8 +399,8 @@ void Shoot::draw()
 			int yp=(int)(3*(rand()/(RAND_MAX+1.0))-2);
 			int ap=(int)(20*(rand()/(RAND_MAX+1.0))-15);
 			
-			shootback.setAlpha(130+ap);
-			shootback.setPos((int)lastx-xp, (int)lasty-yp);
+			shootback.setAlpha(120+ap);
+			shootback.setPos((int)(x+lastx)/2-xp, (int)(y+lasty)/2-yp);
 			shootback.draw();
 			shootback.setAlpha(160+ap);
 			shootback.setPos((int)x+xp, (int)y+yp);
@@ -798,7 +805,7 @@ void Explosion::activate( int x, int y )
 	expl_sprite.setAlpha(230);
 	expl_sprite.setRepeatmode(false);
 	expl_sprite.resetFrames();
-	sound.play(0);	
+	sound.play(EXPLOSION);	
 }
 
 void Explosion::draw() 

@@ -29,8 +29,16 @@
 
 void Language::toggle()
 {
-	language++;
-	language=language%2;
+	switch (language) {
+		case ENGLISH:
+			language=GERMAN;
+			break;
+		case GERMAN:
+			language=ENGLISH;
+			break;
+		default:
+			language=ENGLISH;
+	}	
 }
 	
 char* Language::getWindowtext()
@@ -82,7 +90,7 @@ std::string Language::getScrollertext()
 		"GEWIDMET MEINER ULI     ";
 	const std::string SCROLLERTEXT_e="THE KEYS  1  2  3  FOR GAMEMODE   "
 		"TAB CHANGES THE GALAXY   "
-		"CURSOR LEFT UND RIGHT TO SET THE SHOOTANGLE   "
+		"CURSOR LEFT AND RIGHT TO SET THE SHOOTANGLE   "
 		"CURSOR UP AND DOWN TO MOVE THE SPACESHIP   "
 		"KEEP SPACE PRESSED TO INCREASE SHOOTPOWER   RELEASE SPACE TO FIRE   "
 		"F TOGGLES WINDOW AND FULLSCREEN MODE   "

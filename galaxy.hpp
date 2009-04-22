@@ -44,7 +44,7 @@
 class Planet
 {
 public:
-	Planet( int x, int y, int type );
+	Planet( int x, int y, Planettype type );
 	
 	~Planet();
 	
@@ -72,9 +72,9 @@ public:
 		
 	void drawBlackHole();
 
-	static int getWeightByType( int type );
+	static int getWeightByType( Planettype type );
 
-	static Sprite getImageByType( int type );
+	static Sprite getImageByType( Planettype type );
 
 private:
 	double x, y;

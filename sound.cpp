@@ -28,16 +28,10 @@
 #include "sound.hpp"
 
 Soundset::Sample Soundset::sounds[ NUMBEROFCHANNELS ];
+bool Soundset::soundOn=true;
 
 Soundset::Soundset()
 {
-	format.freq = 22050;
-	format.format = AUDIO_S16;
-	format.channels = 2;
-	format.samples = 512;
-	format.callback = &(Soundset::mixAudio);
-	format.userdata = NULL;
-	
 	char* SOUNDSETNAMES[]={ 
 		"snd/explosion.wav",	// 0
 		"snd/laser.wav",    	// 1
@@ -50,12 +44,9 @@ Soundset::Soundset()
 		loadAudio( SOUNDSETNAMES[i], i );
 	}
 
-	if ( SDL_OpenAudio(&format, NULL) < 0 ) {
-		std::cout << "Error in Sound: " << SDL_GetError() << std::endl;
-		exit(1);
-	}
-	
-	SDL_PauseAudio(0);
+	soundOn=true;
+
+	start();
 }
 
 Soundset::~Soundset()
@@ -65,7 +56,12 @@ Soundset::~Soundset()
 	for (int i=0; i<_SOUNDSETNAMES; i++) free( cvt[i].buf ); 
 }
 
-void Soundset::play(int id)
+void Soundset::toggle()
+{
+	soundOn=!soundOn;
+}
+
+void Soundset::play(SoundId id)
 {
 	if (id>=0 && id<=_SOUNDSETNAMES) {
 		int index;
@@ -86,6 +82,23 @@ void Soundset::play(int id)
 			SDL_UnlockAudio();
 		}
 	}
+}
+
+void Soundset::start()
+{
+	format.freq = 22050;
+	format.format = AUDIO_S16;
+	format.channels = 2;
+	format.samples = 512;
+	format.callback = &(Soundset::mixAudio);
+	format.userdata = NULL;
+	
+	if ( SDL_OpenAudio(&format, NULL) < 0 ) {
+		std::cout << "Error in Sound: " << SDL_GetError() << std::endl;
+		exit(1);
+	}
+
+	SDL_PauseAudio(0);
 }
 
 void Soundset::loadAudio( char *filename, int id )
@@ -114,7 +127,8 @@ void Soundset::mixAudio( void *, Uint8 *stream, int length )
 	for ( int i=0; i<NUMBEROFCHANNELS; ++i ) {
 		Uint32 size = (sounds[i].dlen-sounds[i].dpos);
 		if ( size > (Uint32)length ) size = length;
-		SDL_MixAudio( stream, &sounds[i].data[ sounds[i].dpos ], size, SDL_MIX_MAXVOLUME );
+		SDL_MixAudio( stream, &sounds[i].data[ sounds[i].dpos ], size,
+			(soundOn) ? SDL_MIX_MAXVOLUME : 0 );
 		sounds[i].dpos += size;
 	}
 }

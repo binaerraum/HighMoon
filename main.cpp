@@ -232,33 +232,37 @@ public:
 			// Ingame-Tasten
 			if (!keypressed) {
 
-				if( keys[SDLK_ESCAPE] ) {
+				if( keys[KEY_QUIT] ) {
 					done=true;
 				}
-				if( keys[SDLK_f] ) {
+				if( keys[KEY_TOGGLEFULLSCREEN] ) {
 					SDL_WM_ToggleFullScreen(MYSDLSCREEN);
 					keypressed=true;
 				}
-				if( keys[SDLK_h] ) {
+				if( keys[KEY_TOGGLEHINT] ) {
 					hintmode=!hintmode;
 					keypressed=true;
 				}
-				if( keys[SDLK_F1] ) {
+				if( keys[KEY_TOGGLESCROLLER] ) {
 					scroller_active=!scroller_active;
 					if (scroller_active) drawScroller(true);
 					keypressed=true;
 				}
-				if( keys[SDLK_F2] ) {
+				if( keys[KEY_TOGGLELANGUAGE] ) {
 					language.toggle();
 					SDL_WM_SetCaption( language.getWindowtext(), NULL );
 					keypressed=true;
 				}
-				if( keys[SDLK_TAB] ) {
+				if( keys[KEY_WARPGALAXY] ) {
 					initGalaxy();
 					keypressed=true;
 				}
+				if( keys[KEY_TOGGLESOUND] ) {
+					sound.toggle();
+					keypressed=true;
+				}
 				
-				if( keys[SDLK_1] ) {
+				if( keys[KEY_ONEPLAYER] ) {
 					players[0]->setComputer(false);
 					players[1]->setComputer(true);
 					players[0]->resetEnergy();
@@ -267,12 +271,12 @@ public:
 					players[1]->inactivate();			
 					active_player=0;
 					setPlayer(0);
-					sound.play(5);
+					sound.play(NEWGAME);
 					shoot.kill();	
 					targetlocked=false;
 					keypressed=true;
 				}
-				if( keys[SDLK_2] ) {
+				if( keys[KEY_TWOPLAYER] ) {
 					players[0]->setComputer(false);
 					players[1]->setComputer(false);
 					players[0]->resetEnergy();
@@ -281,12 +285,12 @@ public:
 					players[1]->inactivate();			
 					active_player=0;
 					setPlayer(0);
-					sound.play(5);
+					sound.play(NEWGAME);
 					shoot.kill();	
 					targetlocked=false;
 					keypressed=true;
 				}
-				if( keys[SDLK_3] ) {
+				if( keys[KEY_DEMO] ) {
 					players[0]->setComputer(true);
 					players[1]->setComputer(true);
 					players[0]->resetEnergy();
@@ -304,19 +308,19 @@ public:
 			// Diese Tasten sind gesperrt sofern der Schuss abgefeuert wurde
 			// oder es einen Gewinner gibt!
 			if (!targetlocked && winner==-1 && !players[active_player]->isComputer()) {
-				if( keys[SDLK_LEFT] ) {
+				if( keys[KEY_DECSHOOT] ) {
 					players[active_player]->decShootAngle();
 				}
-				if( keys[SDLK_RIGHT] ) {
+				if( keys[KEY_INCSHOOT] ) {
 					players[active_player]->incShootAngle();
 				}
-				 if( keys[SDLK_UP] ) {
+				 if( keys[KEY_MOVEUP] ) {
 					players[active_player]->moveN();
 				}
-				if( keys[SDLK_DOWN] ) {
+				if( keys[KEY_MOVEDOWN] ) {
 					players[active_player]->moveS();
 				}
-				if( keys[SDLK_SPACE] ) {
+				if( keys[KEY_FIRE] ) {
 					players[active_player]->incShootPower();
 					targeting=true;
 				}	
@@ -378,8 +382,8 @@ public:
 					for (int i=0; i<MAXPLAYER; i++) {
 						if (players[i]->collision( shoot.getX(), shoot.getY(), shoot.getWidth())) {
 							hitufo=true;
-							players[i]->subEnergy(25);
-							sound.play(4);
+							players[i]->subEnergy(SUBENERGY);
+							sound.play(EXPLOSION);
 							
 							#ifdef __DEBUG__ 
 							__HITS++;
@@ -388,7 +392,7 @@ public:
 							
 							if (players[i]->isDead()) {
 								winner=2-i; // oh oh...
-								sound.play(2);
+								sound.play(WINNINGGAME);
 							}
 							break;
 						}
@@ -436,13 +440,14 @@ public:
 			draw();
 			#endif
 			
-			if( keys[SDLK_F12] ) {
+			if( keys[KEY_SCREENSHOT] && !keypressed ) {
 				static int screenshotid=0;
 				screenshotid++; if (screenshotid>25) screenshotid=25;
 				char filename[]="ufoscreenshotA.bmp";
 				int q=(char)(screenshotid+64);
 				filename[13]=(char)q;
 				SDL_SaveBMP(MYSDLSCREEN, filename );
+				keypressed=true;
 			}
 			
 			timer.delay();	
@@ -516,7 +521,7 @@ private:
 		
 		// Galaxie-Warp
 		if (galaxy->isImploding()) {
-			std::string ss=language.getWarptext( seed,galaxy->getPlanets() );
+			std::string ss=language.getWarptext( seed, galaxy->getPlanets() );
 			std::string s1=language.getWarptext();
 			font->print( (SCREENWIDTH-font->getWidth(s1))/2, 30, s1);
 			font->print( (SCREENWIDTH-font->getWidth(ss))/2, 60, ss);

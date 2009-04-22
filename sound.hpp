@@ -50,14 +50,21 @@ public:
 
 	~Soundset();
 	
-	void play( int id );
+	void toggle();
+	
+	void play( SoundId id );
 		
 private:
 	int amount;
 	SDL_AudioSpec format;
 	SDL_AudioCVT cvt[_SOUNDSETNAMES];
 	static Sample sounds[];
+	static bool soundOn;
 		
+	void start();
+
+	void end();
+	
 	void loadAudio( char *filename, int id );
 
 	static void mixAudio( void*, Uint8 *stream, int length );

@@ -32,10 +32,12 @@
 
 #include <iostream>
 
+enum Languagetype { ENGLISH=0, GERMAN=1 };
+
 class Language
 {
 public:
-	Language() : language(1) {};
+	Language() : language(ENGLISH) {};
 	
 	void toggle();
 	
@@ -58,7 +60,7 @@ public:
 	std::string getWarptext();
 	
 private:
-	int language;
+	Languagetype language;
 
 };
 

@@ -13,9 +13,10 @@ HighMoon is an Artillery/Worms like game - which takes place in
 certain planetsystems.
 
 In that game two spaceships must shoot at each other to destroy
-the shields and the enemy. There are planets and moons between the 
-opponents which will deflect the player's shots... so you have some
-interesting styles of technics to kill the other :)
+the shields and the enemy. There are Planets, Moons and Blackholes
+between the opponents which will deflect the player's shots. Also
+Wormholes will beam the shot... so you have some interesting styles
+of techniques to kill the other :)
 
 Ingame-keys are:
 "1" - Player versus Computer
@@ -27,8 +28,9 @@ Ingame-keys are:
 	the shootpower.
 
 "F" - Toggles window/fullscreen mode. 
-"F1" - Toggles helpscroller.
-"F2" - Toggles language.
+"S" - Toggles Sound. 
+"F1" - Toggles helpscroller
+"F2" - Toggles language
 
 There are no installation routines at the moment. To start the game,
 move to the gamedrawer and execute ./ufo. If you like to, you can 
@@ -48,8 +50,8 @@ spielt.
 
 In dem Spiel muessen sich zwei Ufos beschiessen um sich gegenseitig
 der Schilde zu berauben und letztlich zu vernichten. Zwischen
-den Kontrahenten befindet sich eine Ansammlung von Planeten und
-Monden. Jeder Schuss wird von deren Gravitationsfeldern gnadenlos 
+den Kontrahenten befindet sich eine Ansammlung von Planeten, Monden und
+schwarzen Loechen. Jeder Schuss wird von deren Gravitationsfeldern gnadenlos 
 abgelenkt... dieses erlaubt jedoch auch voellig neue Schusstechniken :)
 
 Spielkommandos sind:
@@ -62,8 +64,9 @@ Spielkommandos sind:
 	desto staerker der Schuss.
 
 "F" - Wechselt zwischen Fenster und Fullscreen-Modus 
+"S" - Schaltet Sound an/aus 
 "F1" - Schaltet Hilfescroller ein/aus
-"F2" - Stellt die Sprache um.
+"F2" - Stellt die Sprache um
 
 Das Spiel wird momentan noch nicht installiert. Um es zu starten
 muss man in das Verzeichnis "ufo" wechselt und dort ./ufo aufrufen. 
