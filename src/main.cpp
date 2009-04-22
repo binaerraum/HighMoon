@@ -747,6 +747,7 @@ int main( int argc, char *argv[], char *envp[] )
 				<< "[RIGHT]  Increase Shootangle." << std::endl 
 				<< "[RETURN] Use Extras to buy Weapon or Shieldpower." << std::endl
 				<< "[SPACE]  Keep pressed to increase Power. Release for shooting." << std::endl 
+				<< "[TAB]    Changes the Galaxy." << std::endl 
 				<< "[F1]     Toggle Help-Scroller on/off." << std::endl 
 				<< "[F2]     Toggle Language." << std::endl 
 				<< "[C]      Toggles Computerstrength (Trainee...Insane)." << std::endl 

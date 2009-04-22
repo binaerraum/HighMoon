@@ -8,6 +8,12 @@
 HighMoon - Duell im All.
 Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
+2005 March 19
+----------------
+HighMoon v1.2.2 - Fixed Segfault-Bug in Language support.
+
+HighMoon v1.2.2 - Fehler in der Sprachunterstuetzung behoben.
+
 2005 March 11
 ----------------
 HighMoon v1.2.1 - Fixed Bug in Language support, Redeclared 

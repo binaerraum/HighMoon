@@ -30,26 +30,24 @@ clean:
 new: 	clean all
 
 install:
-	mkdir -p $(INSTALLBIN)
-	mkdir -p $(INSTALLPATH)
-	mkdir -p $(INSTALLPATH)/gfx
-	mkdir -p $(INSTALLPATH)/snd
-	chmod 755 $(INSTALLPATH)/gfx
-	chmod 755 $(INSTALLPATH)/snd
-	install --strip --mode=755 ufo $(INSTALLPATH)
-	install --mode=644 gfx/* $(INSTALLPATH)/gfx
-	install --mode=644 snd/* $(INSTALLPATH)/snd
-	echo >$(INSTALLBIN)/highmoon '#!/bin/sh'
-	echo >>$(INSTALLBIN)/highmoon 'cd $(INSTALLPATH)'
-	echo >>$(INSTALLBIN)/highmoon './ufo'
-	chmod 755 $(INSTALLBIN)/highmoon
+	@echo -n "Installing HighMoon v"
+	@cat VERSION
+	@echo "Path to Install: $(INSTALLPATH)"
+	@echo "Creating Directories and Installing Files."
+	@mkdir -p $(INSTALLBIN)
+	@mkdir --mode=755 -p $(INSTALLPATH)/gfx $(INSTALLPATH)/snd
+	@install --strip --mode=755 ufo $(INSTALLPATH)
+	@install --mode=644 gfx/* $(INSTALLPATH)/gfx
+	@install --mode=644 snd/* $(INSTALLPATH)/snd
+	@echo "Creating $(INSTALLBIN)/highmoon to run HighMoon."
+	@echo >$(INSTALLBIN)/highmoon '#!/bin/sh'
+	@echo >>$(INSTALLBIN)/highmoon 'cd $(INSTALLPATH)'
+	@echo >>$(INSTALLBIN)/highmoon './ufo'
+	@chmod 755 $(INSTALLBIN)/highmoon
 
 uninstall:
-	rm -f $(INSTALLBIN)/highmoon
-	rm -f $(INSTALLPATH)/ufo
-	rm -f $(INSTALLPATH)/gfx/*
-	rm -f $(INSTALLPATH)/snd/*
-	rmdir $(INSTALLPATH)/gfx
-	rmdir $(INSTALLPATH)/snd
-	rmdir $(INSTALLPATH)
-	
+	@echo -n "Uninstalling HighMoon v"
+	@cat VERSION
+	@echo "Removing Files and Directories."
+	@rm -f $(INSTALLBIN)/highmoon
+	@rm -f -r $(INSTALLPATH)

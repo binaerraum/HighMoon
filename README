@@ -34,17 +34,21 @@ KEYBOARD DURING GAME:
 "1"      Player versus Computer.
 "2"      Player versus Player.
 "3"      Title with Demo (Computer versus Computer).
-"C"      Toggles the Computerstrength.
-"TAB"    Changes the Galaxy.
+"UP"     Move Flying Saucer Up.
+"DOWN"   Move Flying Saucer Down.
+"LEFT"   Decrease Shootangle.
+"RIGHT"  Increase Shootangle.
 "RETURN" If you have collected some Extras, you
-	 can choose Shield-Up, a Heavy-Shot or a
-	 Cluster-Shoot.
+         can choose Shield-Up, a Heavy-Shot or a
+         Cluster-Shoot.
 "SPACE"  Activate a shot. The longer Spacekey is pressed,
-	 the stronger the power of the Shoot.
-"F"      Toggles window/fullscreen mode. 
-"S"      Toggles Sound. 
+         the stronger the power of the Shoot.
+"TAB"    Changes the Galaxy.
 "F1"     Toggles Helpscroller.
 "F2"     Toggles Language.
+"C"      Toggles the Computerstrength.
+"F"      Toggles window/fullscreen mode. 
+"S"      Toggles Sound. 
 
 Read the INSTALL for compile and install instructions.
 
@@ -79,17 +83,21 @@ TASTATURKOMMANDOS SIND:
 "1"      Spieler gegen Computer
 "2"      Spieler gegen Spieler
 "3"      Titel mit Demo (Computer gegen Computer).
-"C"      Aendert die Computerstaerke.
-"TAB"    Wechselt die Galaxie.
+"UP"     Bewegt das Ufo nach oben.
+"DOWN"   Bewegt das Ufo nach unten.
+"LEFT"   Vermindert den Schusswinkel.
+"RIGHT"  Erhoeht den Schusswinkel.
 "RETURN" Fall man genug Extras aufgesammelt hat, kann
          man sich Schildstaerke, einen staerkeren Schuss,
-	 oder einen Streuschuss auswaehlen.
+         oder einen Streuschuss auswaehlen.
 "SPACE"  Erhoeht die Schussstaerke. Der Schuss startet
          beim loslassen.
-"F"      Wechselt zwischen Fenster-/Vollbild-Modus. 
-"S"      Schaltet Sound an/aus. 
+"TAB"    Wechselt die Galaxie.
 "F1"     Schaltet Hilfescroller an/aus.
 "F2"     Wechselt die Sprache.
+"C"      Aendert die Computerstaerke.
+"F"      Wechselt zwischen Fenster-/Vollbild-Modus. 
+"S"      Schaltet Sound an/aus. 
 
 Installations- und Compileanleitung stehen in der INSTALL-Datei.
 

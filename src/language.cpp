@@ -55,6 +55,8 @@ void Language::set( char *language )
 {
 	verbose( "Setting Language to $LANG" );
 
+	if ( language == NULL ) return;
+	
 	if ( !strncmp( language, 	"de", 2 ) ) set( LANG_GERMAN );
 
 	else if ( !strncmp( language,	"fr", 2 ) ) set( LANG_FRENCH );
