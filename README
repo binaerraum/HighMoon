@@ -4,6 +4,39 @@
 ##      ##  ##  ##      ##  ##      ##  ##    ##    ##  ##      ##  ##      ##  ##      ##
 ##      ##  ##    ########  ##      ##  ##    ##    ##    ######      ######    ##      ##
 
+HighMoon - Duel in Space.
+Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
+
+http://highmoon.gerdsmeier.net/
+
+HighMoon is an Artillery/Worms like game - which takes place in
+certain planetsystems.
+
+In that game two spaceships must shoot at each other to destroy
+the shields and the enemy. There are planets and moons between the 
+opponents which will deflect the player's shots... so you have some
+interesting styles of technics to kill the other :)
+
+Ingame-keys are:
+"1" - Player versus Computer
+"2" - Player versus Player
+"3" - Demomode (Computer versus Computer)
+
+"TAB"- Change of the planetensystem
+"SPACE" - Acivate a shot. The longer space is pressed, the stronger
+	the shootpower.
+
+"F" - Toggles window/fullscreen mode. 
+"F1" - Toggles helpscroller.
+"F2" - Toggles language.
+
+There are no installation routines at the moment. To start the game,
+move to the gamedrawer and execute ./ufo. If you like to, you can 
+install an alias or a small loadingscript.
+
+Patrick Gerdsmeier, January 2005.
+
+
 HighMoon - Duell im All.
 Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
@@ -30,6 +63,7 @@ Spielkommandos sind:
 
 "F" - Wechselt zwischen Fenster und Fullscreen-Modus 
 "F1" - Schaltet Hilfescroller ein/aus
+"F2" - Stellt die Sprache um.
 
 Das Spiel wird momentan noch nicht installiert. Um es zu starten
 muss man in das Verzeichnis "ufo" wechselt und dort ./ufo aufrufen. 

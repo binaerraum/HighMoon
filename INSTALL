@@ -4,6 +4,19 @@
 ##      ##  ##  ##      ##  ##      ##  ##    ##    ##  ##      ##  ##      ##  ##      ##
 ##      ##  ##    ########  ##      ##  ##    ##    ##    ######      ######    ##      ##
 
+HighMoon - Duel in Space.
+Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
+
+To compile with linux you need the GNU g++ and the SDL-library:
+make
+
+The game will not be installed at the moment, but started directly
+from it's drawer:
+./ufo
+
+Use make clean to delete alle created files.
+
+
 HighMoon - Duell im All.
 Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>
 
