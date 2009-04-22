@@ -186,6 +186,8 @@ public:
 		SDL_Thread *t=SDL_CreateThread( Playfield::gameLogicThread, NULL );
 		#endif
 
+		SDL_EnableUNICODE(1);
+		
 		do {			
 	
 			while ( SDL_PollEvent(&event) ) {
@@ -206,6 +208,28 @@ public:
 					
 						break;
 				}
+
+				if( event.key.keysym.unicode==UKEY_ONEPLAYER ) {
+					bool p_mode[]={true,false};
+					init_Game( p_mode );
+					targetlocked=false;
+					targeting=false;
+					sound->play(NEWGAME);
+				}
+	
+				if( event.key.keysym.unicode==UKEY_TWOPLAYER ) {
+					bool p_mode[]={true,true};
+					init_Game( p_mode );
+					targetlocked=false;
+					targeting=false;
+					sound->play(NEWGAME);
+				}
+				if( event.key.keysym.unicode==UKEY_DEMO ) {
+					bool p_mode[]={false,false};
+					init_Game( p_mode );
+					targetlocked=false;
+					targeting=false;
+				}			
 			}
 		
 			Uint8 *keys=SDL_GetKeyState(NULL);
@@ -267,36 +291,14 @@ public:
 					sound->toggle();
 					keypressed=true;
 				}
-				
-				if( keys[KEY_ONEPLAYER] ) {
-					bool p_mode[]={true,false};
-					init_Game( p_mode );
-					targetlocked=false;
-					keypressed=true;
-					sound->play(NEWGAME);
-				}
-
-				if( keys[KEY_TWOPLAYER] ) {
-					bool p_mode[]={true,true};
-					init_Game( p_mode );
-					targetlocked=false;
-					keypressed=true;
-					sound->play(NEWGAME);
-				}
-				if( keys[KEY_DEMO] ) {
-					bool p_mode[]={false,false};
-					init_Game( p_mode );
-					targetlocked=false;
-					keypressed=true;
-				}
 			}
-			
+
 			// Diese Tasten sind gesperrt sofern der Schuss abgefeuert wurde
 			// oder es einen Gewinner gibt!
 			if ( winner_is_player==-1 ) {
 
 				if ( players[active_player]->is_Computer() ) {
-					static int computer_strength[]={9, 7, 5, 3, 1};
+					static int computer_strength[]={8, 6, 4, 2, 1};
 						players[active_player]->calculate_Computer_Move(galaxy,computer_strength[computerstrength]);			
 				} else {
 					if ( !targetlocked ) {
@@ -335,6 +337,7 @@ public:
 			if ( galaxy->animate() ) {
 				next_Player();
 				targetlocked=false;
+				targeting=false;
 			}
 
 			set_Scrolling();

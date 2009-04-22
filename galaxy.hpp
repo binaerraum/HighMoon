@@ -87,7 +87,7 @@ public:
 	// This checks if the Object has a collision with an
 	// Area presented by x, y and width values.
 	// Returns TRUE if there was a collision.
-	bool check_collision( double x, double y, double width, bool spacing=false );
+	virtual bool check_collision( double x, double y, double width, bool spacing=false );
 	
 	// Graphical Output on the Screen
 	virtual void draw();
@@ -105,8 +105,41 @@ protected:
 	double speed, direction;
 	double spacing;
 	bool in_background;
-	
+
+	bool check_sphere_collision( double x, double y, double width, bool spacing=false );
 };
+
+/************************************************************************
+ *									*
+ * Stone ( Moons and Ring-Objects )					*
+ *									*
+ ************************************************************************/
+class Stone : public Spaceobject
+{
+public:
+	Stone( double x=0, double y=0, double angle=-1 );
+
+	~Stone();
+
+	void set_Distance( double distance );
+	
+	bool check_collision( double x, double y, double width, bool spacing=false );
+
+	void draw( bool behind_planet=true );
+
+	void hit( Spaceobject *object );
+	
+private:
+	bool is_moon;
+	double pos_1, pos_2;
+	double x_a, y_a;
+	double speed;
+	double distance;
+	
+	Sprite *stone_sprite,
+		*stone_mask;
+};
+
 
 /************************************************************************
  *									*
@@ -120,6 +153,8 @@ public:
 
 	~Planet();
 		
+	bool check_collision( double x, double y, double width, bool spacing=false );
+
 	void draw();
 
 	void hit( Spaceobject *object );
@@ -131,11 +166,13 @@ private:
 		P_JUPITER=0,
 		P_EARTH=1,
 		P_MARS=2,
-		P_MOON=3 
+		P_GRAY=3,
+		P_GREEN=4 
 	} planet_type;
 
 	Sprite *planet_sprite;
-
+	Stone *objects[MAXSTONES];
+	int objects_of_planet;
 };
 
 /************************************************************************
@@ -150,6 +187,8 @@ public:
 
 	~Blackhole();
 		
+	bool check_collision( double x, double y, double width, bool spacing=false );
+
 	void draw();
 
 	void hit( Spaceobject *object );
@@ -172,6 +211,8 @@ public:
 
 	~Wormhole();
 		
+	bool check_collision( double x, double y, double width, bool spacing=false );
+
 	void draw();
 
 	void hit( Spaceobject *object );
@@ -199,6 +240,8 @@ public:
 
 	void activate( double x, double y );
 	
+	bool check_collision( double x, double y, double width, bool spacing=false );
+
 	void draw();
 
 	void hit( Spaceobject *object );
@@ -230,6 +273,8 @@ public:
 	void destroy();
 
 	bool move( Galaxy *galaxy );
+
+	bool check_collision( double x, double y, double width, bool spacing=false );
 
 	void draw();
 
@@ -297,6 +342,8 @@ public:
 	Shoot *shoot();
 	
 	bool calculate_Computer_Move( Galaxy *galaxy, int factor );
+
+	bool check_collision( double x, double y, double width, bool spacing=false );
 
 	void draw();
 	

@@ -112,7 +112,13 @@ bool Spaceobject::has_collision( Spaceobject *object )
 	return false;
 }
 
-bool Spaceobject::check_collision( double x, double y, double width, bool spacing )
+bool Spaceobject::check_collision( double x, double y, double width, bool spacing ) { return false; }
+
+void Spaceobject::draw() {}
+
+void Spaceobject::hit( Spaceobject *object ) {}
+
+bool Spaceobject::check_sphere_collision( double x, double y, double width, bool spacing )
 {
 	double my_x=get_X();
 	double my_y=get_Y();
@@ -127,9 +133,102 @@ bool Spaceobject::check_collision( double x, double y, double width, bool spacin
 	return dist_Center<=dist_Radius;	
 }
 
-void Spaceobject::draw() {}
+/************************************************************************
+ *									*
+ * Stone									*
+ *									*
+ ************************************************************************/
+Stone::Stone( double x, double y, double angle )
+:
+	Spaceobject ( x, y )
+{
+	pos_1=RANDOM(2*PI,0);
+	distance=0;
 
-void Spaceobject::hit( Spaceobject *object ) {}
+	if (angle==-1) {
+		is_moon=true;
+		pos_2=RANDOM(2*PI,0);
+		stone_sprite=new Sprite("gfx/moon.gif");
+		stone_mask=new Sprite("gfx/moon_mask.gif");
+		speed=RANDOM(1,3);
+	} else {
+		is_moon=false;
+		pos_2=angle;
+		stone_sprite=new Sprite("gfx/stone.gif");
+		stone_mask=new Sprite("gfx/stone_mask.gif");	
+		speed=RANDOM(1,2);
+	}
+
+	width=(double)stone_sprite->getWidth()-1;
+	x_a=x;
+	y_a=y;
+}
+
+Stone::~Stone() 
+{
+	delete stone_sprite;
+	delete stone_mask;
+}
+
+void Stone::set_Distance( double distance )
+{
+	this->distance=distance;
+}
+
+bool Stone::check_collision( double x, double y, double width, bool spacing )
+{
+	double my_x=x_a;
+	double my_y=y_a;
+	double my_width=get_Width();
+
+	double dist_Center=sqrt( (x-my_x)*(x-my_x) + (y-my_y)*(y-my_y) );
+	double dist_Radius=( width+ my_width )/2;
+
+	return dist_Center<=dist_Radius;	
+}
+
+void Stone::draw( bool behind_planet )
+{
+	double z=sin(pos_1+PI/180*90)/2+0.5;
+
+	if ( ( behind_planet && z>=0.5 ) ||
+		( !behind_planet && z<0.5 ) ) {
+		
+		if ( is_moon ) {
+			x_a=sin(pos_1)*distance+x;
+			y_a=sin(pos_2)*distance+y;
+		} else {
+			x_a=sin(pos_1)*distance+x;
+			y_a=sin(pos_2)*cos(pos_1)/2*distance+y;
+		}
+
+		stone_sprite->setPos( (int)x_a, (int)y_a );
+		stone_sprite->draw();
+		stone_mask->setPos( (int)x_a, (int)y_a );
+		stone_mask->setAlpha( (int)(z*160) );
+		stone_mask->draw();
+	
+		if ( is_moon ) {
+			pos_1+=PI/180*speed;
+			pos_2+=PI/180*speed;
+		} else {
+			pos_1+=PI/180*speed;		
+			pos_2+=PI/180*1;
+		}
+		
+		if ( pos_1>2*PI )
+			pos_1-=2*PI;
+	
+		if ( pos_2>2*PI )
+			pos_2-=2*PI;
+	}
+	
+}
+
+void Stone::hit( Spaceobject *object )
+{
+	object->hit( this );
+}
 
 /************************************************************************
  *									*
@@ -142,41 +241,79 @@ Planet::Planet( double x, double y )
 	hit_vector( Vector_2( 0, 0, K ) )
 {	
 	char *planet_filename="";
-	planet_type=(Planettype)RANDOM(4,0);
+	planet_type=(Planettype)RANDOM(5,0);
 
 	switch ( planet_type ) {
 
 		case P_JUPITER:
 			planet_filename="gfx/jupiter.gif";
 			weight=WEIGHT_JUPITER;
-			spacing=50;
+			spacing=100;
+			objects_of_planet=3;
 			break;
 	
 		case P_EARTH:
 			planet_filename="gfx/earth.gif";
 			weight=WEIGHT_EARTH;
-			spacing=40;
+			spacing=80;
+			objects_of_planet=1;
 			break;
 			
 		case P_MARS:
 			planet_filename="gfx/mars.gif";
 			weight=WEIGHT_MARS;
 			spacing=30;
+			objects_of_planet=0;
 			break;
 
-		case P_MOON:
-			planet_filename="gfx/moon.gif";
-			weight=WEIGHT_MOON;
-			spacing=10;
+		case P_GRAY:
+			planet_filename="gfx/gray.gif";
+			weight=WEIGHT_GRAY;
+			spacing=30;
+			objects_of_planet=0;
+			break;
+
+		case P_GREEN:
+			planet_filename="gfx/green.gif";
+			weight=WEIGHT_GREEN;
+			spacing=70;
+			objects_of_planet=MAXSTONES;
 	}
 	
 	planet_sprite=new Sprite( planet_filename );
 	width=(double)planet_sprite->getWidth()-2;	// Sub Anti-Alias Borders!
+	double angle_ring=RANDOM(2*PI,0), distance;
+	
+	for (int i=0; i<objects_of_planet; i++) {
+		if ( objects_of_planet>3 ) {
+			objects[i]=new Stone( 0,0,angle_ring );
+			distance=width/2+RANDOM(35,15);
+		} else {		
+			objects[i]=new Stone();
+			distance=width/2+RANDOM(15,10);
+		}
+		objects[i]->set_Distance( distance );
+	}
 }
 
 Planet::~Planet()
 {
 	delete planet_sprite;
+	
+	for (int i=0; i<objects_of_planet; i++) 
+		delete objects[i];	
+}
+
+bool Planet::check_collision( double x, double y, double width, bool spacing )
+{
+	if (check_sphere_collision( x, y, width, spacing ))
+		return true;
+
+	for (int i=0; i<objects_of_planet; i++)
+		if (objects[i]->check_collision( x, y, width ))
+			return true;
+	
+	return false;
 }
 
 void Planet::draw()
@@ -188,9 +325,16 @@ void Planet::draw()
 		set_Pos( v.getX(), v.getY() );
 	}
 
+	for (int i=0; i<objects_of_planet; i++) {
+		objects[i]->set_Pos( x, y );
+		objects[i]->draw(true);
+	}
+
 	planet_sprite->setPos( (int)x, (int)y );
 	planet_sprite->draw();
 
+	for (int i=0; i<objects_of_planet; i++) 
+		objects[i]->draw(false);
 }
 
 void Planet::hit( Spaceobject *object )
@@ -230,6 +374,11 @@ Blackhole::~Blackhole()
 
 	for ( int i=0; i<MAXHOLE; i++ ) 
 		delete particles[i];
+}
+
+bool Blackhole::check_collision( double x, double y, double width, bool spacing )
+{
+	return check_sphere_collision( x, y, width, spacing );
 }
 
 void Blackhole::draw() 
@@ -333,6 +482,11 @@ Wormhole::~Wormhole()
 {
 	for ( int i=0; i<MAXWORM/15; i++ ) 
 		delete start_particles[i];
+}
+
+bool Wormhole::check_collision( double x, double y, double width, bool spacing )
+{
+	return check_sphere_collision( x, y, width, spacing );
 }
 
 void Wormhole::draw() 
@@ -606,7 +760,7 @@ bool Ufo::calculate_Computer_Move( Galaxy *galaxy, int factor )
 		found=s.will_be_a_Hit( player_id, factor, start, direction, galaxy );
 		
 		#ifdef __DEBUG__ 
-		//if (found) std::cout << "*** FEIND ENTDECKT BEI MIT " <<  start << ", " << direction << std::endl;
+		//if (found) std::cout << "*** FEIND ENTDECKT BEI " <<  start << ", " << direction << std::endl;
 		#endif
 		
 		if (--searches<0) found=true;
@@ -669,6 +823,11 @@ bool Ufo::calculate_Computer_Move( Galaxy *galaxy, int factor )
 
 }
 
+bool Ufo::check_collision( double x, double y, double width, bool spacing )
+{
+	return check_sphere_collision( x, y, width, spacing );
+}
+
 void Ufo::draw() 
 {
 	ufo_sprite->setPos( (int)(this->get_X()-2), (int)(get_Y()+10) );
@@ -728,7 +887,7 @@ void Ufo::draw_Targetmode()
 
 void Ufo::draw_Computermode()
 {
-	if ( is_Computer() ) { 
+	if ( is_Computer() && is_active ) { 
 		
 		switch (computer_mode) {
 		
@@ -784,6 +943,11 @@ void Explosion::activate( double x, double y )
 	exploding=true;
 	
 	sound->play(EXPLOSION);
+}
+
+bool Explosion::check_collision( double x, double y, double width, bool spacing )
+{
+	return false;
 }
 
 void Explosion::draw()
@@ -907,6 +1071,11 @@ void Shoot::draw_hint( Vector_2 start, Vector_2 direction, Galaxy *galaxy )
 	}
 
 	SDL_UnlockSurface( MYSDLSCREEN );
+}
+
+bool Shoot::check_collision( double x, double y, double width, bool spacing )
+{
+	return check_sphere_collision( x, y, width, spacing );
 }
 
 void Shoot::draw()
@@ -1097,8 +1266,8 @@ bool Galaxy::create( int max, int id )
 			}
 			
 			do {	
-				x_test=RANDOM( SCREENWIDTH-175, 175 );
-				y_test=RANDOM( SCREENHEIGHT-20, +10 );
+				x_test=RANDOM( SCREENWIDTH-220, 220 );
+				y_test=RANDOM( SCREENHEIGHT, 0 );
 				width_test=tmp_planet->get_Width() + tmp_planet->get_Spacing();
 			} while ( check_collision( x_test, y_test, width_test, true ) );
 

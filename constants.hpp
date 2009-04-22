@@ -38,7 +38,7 @@
 //#define __WIN32__
 //#define __MACOSX__
 
-const std::string VERSION="1.1";
+const std::string VERSION="1.1.1";
 const std::string COPYRIGHT="Copyright (c) 2005, Patrick Gerdsmeier <patrick@gerdsmeier.net>";
 const std::string WEBSITE="http://highmoon.gerdsmeier.net";
 
@@ -70,9 +70,9 @@ const int KEY_TOGGLEFULLSCREEN=SDLK_f;
 const int KEY_TOGGLESCROLLER=SDLK_F1;
 const int KEY_TOGGLELANGUAGE=SDLK_F2;
 const int KEY_SCREENSHOT=SDLK_F12;
-const int KEY_ONEPLAYER=SDLK_1;
-const int KEY_TWOPLAYER=SDLK_2;
-const int KEY_DEMO=SDLK_3;
+const int UKEY_ONEPLAYER=48+1;
+const int UKEY_TWOPLAYER=48+2;
+const int UKEY_DEMO=48+3;
 const int KEY_STRENGTH=SDLK_c;
 const int KEY_TOGGLESOUND=SDLK_s;	// undocumented screenshot feature... =)
 const int KEY_TOGGLEHINT=SDLK_h;	// undocumented feature, built in for testing only... =)
@@ -88,14 +88,16 @@ const int MAXGOLDRAIN=150;		// Pixels in Goldrain
 const int MAXSTARS=100;			// Stars in Background
 
 // PLANETS
-const int MAXPLANETS=12;		// max. Planets in a Galaxy
-const int MINPLANETS=5;			// min. -"-
+const int MAXPLANETS=8;			// max. Planets in a Galaxy
+const int MINPLANETS=4;			// min. -"-
 const int WEIGHT_JUPITER=350;		// Weight is important for the gravity!
 const int WEIGHT_EARTH=300;
 const int WEIGHT_MARS=200;
-const int WEIGHT_MOON=100;
+const int WEIGHT_GRAY=180;
+const int WEIGHT_GREEN=250;
 const int WEIGHT_BLACKHOLE=350;
 const int WEIGHT_WORMHOLE=50;
+const int MAXSTONES=30;
 
 // SHOOT
 const int MAXSHOOTS=1;			// Shoots per Player (Don't change!)
