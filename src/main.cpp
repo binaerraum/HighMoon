@@ -37,8 +37,8 @@
 
 #include "stdio.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL.h>
+#include <SDL_image.h>
 
 #include "constants.hpp"
 #include "vector_2.hpp"
@@ -52,7 +52,7 @@
 #endif
 
 #ifdef __THREADS__
-#include <SDL/SDL_thread.h>
+#include <SDL_thread.h>
 #endif
 
 #ifdef __DEBUG__

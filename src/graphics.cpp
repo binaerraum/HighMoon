@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <cmath>
 
-#include <SDL/SDL_image.h>
+#include <SDL_image.h>
 
 #include "graphics.hpp"
 

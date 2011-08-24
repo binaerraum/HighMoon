@@ -9,10 +9,13 @@ INSTALLBIN=/home/pat/Programme/Spiele/bin
 
 CACHE	 = #ccache	# use http://ccache.samba.org to speedup compiling
 CXX      = $(CACHE) g++ 
-CXXFLAGS = -g -O3 -Wall `sdl-config --cflags`
+CXXFLAGS = -g -O3 -Wall -arch i386
+#CXXFLAGS = -g -O3 -Wall #`sdl-config --cflags`
 LDFLAGS  = #-static -s
-LIBS     = -L. `sdl-config --libs` -lSDL_image
+LDFLAGS = -arch i386
+#LIBS     = -L. `sdl-config --libs` -lSDL_image
 #LIBS     = -L. `sdl-config --static-libs` -lSDL_image -lpng -ljpeg -lz -lm
+LIBS     = -L. -L/Library/Frameworks/SDL.framework/ -L/Library/Frameworks/SDL_image.framework/  -framework SDL -framework SDL_image -framework Cocoa
 SRCDIR   = src
 BIN      = ufo
 
